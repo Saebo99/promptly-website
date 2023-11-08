@@ -70,7 +70,10 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-700">
+    <div
+      className="h-screen w-screen flex flex-col"
+      style={{ background: "linear-gradient(to bottom, #4B5C78, #222831)" }}
+    >
       <Navbar />
       <div className="flex-grow flex items-center justify-center">
         <div className="w-full flex flex-col items-center justify-center bg-gray-800 max-w-md px-8 py-6 rounded-lg shadow-md">
