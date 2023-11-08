@@ -45,6 +45,7 @@ const HeroPage = () => {
         chatStyle={{
           backgroundColor: "#222831",
           color: "white",
+          border: "1px solid #4B5C78",
         }}
         inputFieldStyle={{
           backgroundColor: "#222831",
@@ -58,9 +59,7 @@ const HeroPage = () => {
           backgroundColor: "#222831",
           color: "white",
         }}
-        separatorStyle={{
-          borderColor: "#222831",
-        }}
+        separatorColor="#222831"
       />
     </div>
   );
