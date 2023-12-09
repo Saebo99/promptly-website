@@ -75,10 +75,8 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
   };
 
   return (
-    <div className="w-screen flex flex-col justify-center items-center space-y-6 text-white">
-      <h1 className="text-4xl font-bold mb-6">
-        Write the name of your project
-      </h1>
+    <div className="w-screen h-[50vh] flex flex-col items-center space-y-6 text-white">
+      <h1 className="text-4xl font-bold mb-6">Name of your project</h1>
       <div>
         <input
           type="text"
@@ -86,8 +84,8 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
           className={`bg-transparent border-b ${
             isValid(projectName) && !nameInputTouched
               ? "border-black"
-              : "border-[#00ADB5]"
-          } focus:outline-none focus:border-[#00ADB5] w-96 text-2xl font-semibold`}
+              : "border-[#393E46]"
+          } focus:outline-none focus:border-[#4B5C78] w-96 text-2xl font-semibold`}
           value={projectName}
           onChange={handleProjectNameChange}
           onBlur={() => setNameInputTouched(true)} // <-- Add this event handler
@@ -104,7 +102,7 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
           {showIdEditor && (
             <div
               ref={idEditorRef}
-              className="absolute top-0 left-0 p-4 rounded shadow-md border border-[#393E46] z-10 space-y-4 bg-[#222831]"
+              className="absolute top-4 left-0 p-4 rounded shadow-md border border-[#393E46] z-10 space-y-4 bg-[#222831]"
             >
               <h2 className="font-semibold">Project ID</h2>
               <p className="text-xs mb-2">
@@ -114,7 +112,7 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
               <input
                 type="text"
                 value={tempProjectId}
-                className={`border border-[#393E46] focus:border-[#00ADB5] outline-none rounded p-2 w-full bg-[#222831] ${
+                className={`border border-[#393E46] focus:border-[#4B5C78] outline-none rounded p-2 w-full bg-[#222831] ${
                   isValidId(tempProjectId) ? "" : "border-red-500"
                 }`}
                 onChange={(e) => {
@@ -129,7 +127,7 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
               )}
               <div className="flex justify-end space-x-4">
                 <button
-                  className="text-gray-500"
+                  className="text-gray-400"
                   onClick={() => {
                     setTempProjectId(projectId);
                     setShowIdEditor(false);
@@ -139,11 +137,11 @@ const ProjectConfig: React.FC<ProjectConfigProps> = ({
                 </button>
                 <button
                   disabled={!isValidId(tempProjectId)}
-                  className={`border bg-[#222831] ${
+                  className={`bg-[#222831] ${
                     isValidId(tempProjectId)
-                      ? "border-[#00ADB5] text-white hover:bg-[#00ADB5]"
-                      : "border-[#393E46] text-gray-400"
-                  } rounded px-4 py-1 duration-300`}
+                      ? "text-white hover:bg-[#4B5C78]"
+                      : "text-gray-400"
+                  } rounded px-4 py-1 duration-100`}
                   onClick={() => {
                     setProjectId(tempProjectId);
                     setIsProjectIdValid(isValidId(tempProjectId));

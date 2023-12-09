@@ -7,13 +7,16 @@ export const ingestFile = async (file: any, apiKey: string) => {
 
   try {
     // Send the file to the server using fetch
-    const response = await fetch("http://localhost:3000/api/ingestFile", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: formData,
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v0/ingestFile`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: formData,
+      }
+    );
 
     // Check if the request was successful
     if (!response.ok) {

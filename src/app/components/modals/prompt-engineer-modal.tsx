@@ -62,7 +62,7 @@ const PromptEngineerModal = () => {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="mb-4 p-2 w-full bg-[#222831] rounded border border-[#393E46] focus:border-[#00ADB5] focus:outline-none"
+          className="mb-4 p-2 w-full bg-[#222831] rounded border border-[#393E46] focus:border-[#4B5C78] focus:outline-none"
           placeholder="Describe your chatbot here..."
         />
         <button
@@ -70,9 +70,9 @@ const PromptEngineerModal = () => {
           disabled={!inputText.trim()}
           className={`${
             inputText.trim()
-              ? "bg-[#222831] border border-[#00ADB5] hover:bg-[#00ADB5] duration-300"
-              : "bg-[##222831] border border-[#393E46] cursor-not-allowed"
-          } text-white py-2 px-4 rounded`}
+              ? "bg-[#222831] hover:bg-[#4B5C78] duration-300"
+              : "bg-[##222831] cursor-not-allowed"
+          } text-gray-400 hover:text-white py-2 px-4 rounded`}
         >
           Generate Prompt
         </button>

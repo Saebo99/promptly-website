@@ -10,18 +10,21 @@ export const ingestData = async (
   }
 
   // Send request to your server route
-  //${process.env.NEXT_PUBLIC_API_URL}
-  const response = await fetch(`http://localhost:3000/api/ingestData`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      urls,
-      crawlType,
-    }),
-  });
+  //
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/v0/ingestData`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        urls,
+        crawlType,
+      }),
+    }
+  );
 
   // Handle the response
   if (!response.ok) {

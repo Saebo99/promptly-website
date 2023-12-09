@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile, faLink } from "@fortawesome/pro-solid-svg-icons";
+import { faFile, faLink, faVideo } from "@fortawesome/pro-solid-svg-icons";
 
 interface SourceSelectionProps {
   handleSourceClick: (source: string) => void;
@@ -13,6 +13,7 @@ const SourceSelection: React.FC<SourceSelectionProps> = ({
   const sources = [
     { name: "URL", icon: faLink },
     { name: "File/Folder", icon: faFile },
+    { name: "Video", icon: faVideo },
   ];
 
   return (

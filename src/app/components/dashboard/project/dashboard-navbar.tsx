@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 import { db } from "@/app/firebase/firebaseClient";
 import { motion } from "framer-motion";
@@ -81,18 +82,37 @@ const DashboardNavbar = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 60 }}
         >
-          <Link href="/" style={{ marginRight: "30%" }}>
-            <div className="text-white">Promptly</div>
+          <Link
+            href="/"
+            className="flex justify-center items-center"
+            style={{ marginRight: "30%" }}
+          >
+            <Image
+              src="/flexibel-logo.svg"
+              alt="My SVG"
+              width={20}
+              height={20}
+              className="mr-2"
+            />
+            <Image
+              src="/flexibel-text.svg"
+              alt="My SVG"
+              width={130}
+              height={150}
+              className="mt-2"
+            />
           </Link>
         </motion.div>
       </div>
 
       <div className="flex items-center space-x-4">
-        <button className="py-1 px-2 rounded text-white flex items-center border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300">
-          <FontAwesomeIcon icon={faBook} className="mr-2" />
-          Docs
+        <button className="py-1 px-2 rounded text-white flex items-center bg-[#222831] hover:bg-[#4B5C78] transition duration-100">
+          <Link href="https://docs.flexibel.ai">
+            <FontAwesomeIcon icon={faBook} className="mr-2" />
+            Docs
+          </Link>
         </button>
-        <button className="py-1 px-2 rounded text-white flex items-center border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300">
+        <button className="py-1 px-2 rounded text-white flex items-center bg-[#222831] hover:bg-[#4B5C78] transition duration-100">
           <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
           Help
         </button>

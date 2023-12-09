@@ -14,6 +14,7 @@ interface ProjectState {
       isActive: boolean;
     };
   };
+  whitelistModalOpen: boolean;
 }
 
 const initialState: ProjectState = {
@@ -29,6 +30,7 @@ const initialState: ProjectState = {
       isActive: false,
     },
   },
+  whitelistModalOpen: false,
 };
 
 export const projectSlice = createSlice({
@@ -44,14 +46,23 @@ export const projectSlice = createSlice({
     setCurrentProject: (state, action: PayloadAction<any>) => {
       state.currentProject = action.payload;
     },
+    setWhitelistModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.whitelistModalOpen = action.payload;
+    },
   },
 });
 
-export const { setProjectId, setProjectIdentifier, setCurrentProject } =
-  projectSlice.actions;
+export const {
+  setProjectId,
+  setProjectIdentifier,
+  setCurrentProject,
+  setWhitelistModalOpen,
+} = projectSlice.actions;
 
 export const selectProjectId = (state: RootState) => state.project.projectId;
 export const selectProjectIdentifier = (state: RootState) =>
   state.project.projectIdentifer;
 export const selectCurrentProject = (state: RootState) =>
   state.project.currentProject;
+export const selectWhitelistModalOpen = (state: RootState) =>
+  state.project.whitelistModalOpen;

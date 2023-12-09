@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import Select from "react-select";
 
 import { useSelector } from "react-redux";
@@ -16,13 +18,18 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUser,
-  faRobot,
-  faRefresh,
   faBookmark,
+  faExternalLinkAlt,
+  faChevronLeft,
+  faThumbsUp,
+  faThumbsDown,
+  faPlus,
 } from "@fortawesome/pro-solid-svg-icons";
+import { faUser } from "@fortawesome/pro-regular-svg-icons";
 
 import { faBookmark as farBookmark } from "@fortawesome/pro-regular-svg-icons";
+
+import { ingestImprovedAnswer } from "@/app/utils/ingestImprovedAnswer";
 
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
@@ -49,10 +56,10 @@ const customStyles = {
     minWidth: 100,
     backgroundColor: "#222831",
     color: "white",
-    borderColor: "#00ADB5", // border
+    borderColor: "#4B5C78", // border
     boxShadow: "none", // Remove box shadow on focus
     "&:hover": {
-      borderColor: "#00ADB5", // border on hover
+      borderColor: "#4B5C78", // border on hover
     },
   }),
   menu: (provided: any) => ({
@@ -70,11 +77,11 @@ const customStyles = {
   }),
   dropdownIndicator: (provided: any) => ({
     ...provided,
-    color: "skyBlue", // chevron
+    color: "#4B5C78", // chevron
   }),
   indicatorSeparator: (provided: any) => ({
     ...provided,
-    backgroundColor: "skyBlue", // separator line, if visible
+    backgroundColor: "#4B5C78", // separator line, if visible
   }),
 };
 
@@ -85,6 +92,51 @@ const Insight = () => {
   const [loading, setLoading] = useState<any>(true);
   const [conversations, setConversations] = useState<any>([]);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [question, setQuestion] = useState<string>("");
+  const [answer, setAnswer] = useState<string>("");
+  const [selectedSource, setSelectedSource] = useState<string>("");
+
+  const handleSelectMessage = (message: any, index: number) => {
+    if (message.role !== "user") {
+      setSelectedMessage(message);
+      if (message?.improvedAnswer) {
+        console.log("selectedMessage.improvedAnswer: ", message.improvedAnswer);
+        setAnswer(message.improvedAnswer.answer);
+      } else {
+        setAnswer("");
+      }
+      const currentQuestion = selectedConversation.messages[index - 1].content;
+      if (message?.improvedAnswer) {
+        setQuestion(message.improvedAnswer.question);
+      } else {
+        setQuestion(currentQuestion);
+      }
+    }
+  };
+
+  const handleCreateImprovedAnswer = async () => {
+    try {
+      if (question && answer) {
+        // Call your utility function
+        await ingestImprovedAnswer(
+          projectId,
+          selectedConversation.id,
+          selectedMessage.messageId,
+          question,
+          answer
+        );
+        console.log("Improved answer created successfully");
+        // Optionally reset the form fields
+        setQuestion("");
+        setAnswer("");
+      } else {
+        console.log("Question and answer are required");
+      }
+    } catch (error) {
+      console.error("Failed to create improved answer", error);
+    }
+  };
 
   const filterConversationsByMessageFilter = (
     conversations: any,
@@ -305,34 +357,26 @@ const Insight = () => {
           <div className="w-full">
             <DashboardNavbar />
             <TopBar />
-            {/* Refresh Button */}
-            <div className="ml-10 my-4">
-              <button
-                className="flex items-center px-4 py-2 rounded border border-[#393E46] hover:border-[#00ADB5] duration-300"
-                onClick={fetchConversations}
-              >
-                <FontAwesomeIcon icon={faRefresh} className="mr-2" />
-                Refresh
-              </button>
-            </div>
             <div className="flex h-[70vh] mx-10 border border-[#393E46] rounded shadow-lg">
-              <div className="w-1/3 h-full flex flex-col border-r border-[#393E46]">
+              <div className="w-1/5 h-full flex flex-col border-r border-[#393E46]">
                 {/* Dropdown Filters */}
-                <div className="w-full mt-2 px-2 pb-2 flex space-x-2 border-b border-[#393E46]">
-                  <Select
-                    styles={customStyles}
-                    options={timeOptions}
-                    defaultValue={timeOptions[4]} // Defaults to 'All Time'
-                    onChange={handleTimeFilterChange}
-                    isSearchable={false}
-                  />
-                  <Select
-                    styles={customStyles}
-                    options={messageOptions}
-                    defaultValue={messageOptions[0]} // Defaults to 'All messages'
-                    onChange={handleMessageFilterChange}
-                    isSearchable={false}
-                  />
+                <div className="w-full h-14 space-x-2 border-b border-[#393E46]">
+                  <div className="h-full flex justify-center items-center pl-2 space-x-4">
+                    <Select
+                      styles={customStyles}
+                      options={timeOptions}
+                      defaultValue={timeOptions[4]} // Defaults to 'All Time'
+                      onChange={handleTimeFilterChange}
+                      isSearchable={false}
+                    />
+                    <Select
+                      styles={customStyles}
+                      options={messageOptions}
+                      defaultValue={messageOptions[0]} // Defaults to 'All messages'
+                      onChange={handleMessageFilterChange}
+                      isSearchable={false}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex-grow overflow-y-auto">
@@ -343,9 +387,10 @@ const Insight = () => {
                     return (
                       <div
                         key={conversation.id} // Unique key for each child
-                        className={`cursor-pointer p-4 m-2 rounded border border-transparent hover:border-[#00ADB5] ${
-                          conversation.id === selectedConversation?.id &&
-                          "bg-[#00ADB5]"
+                        className={`cursor-pointer p-4 m-2 rounded border border-transparent hover:bg-[#4B5C78] duration-100 ${
+                          conversation.id === selectedConversation?.id
+                            ? "bg-[#4B5C78] text-white"
+                            : "text-gray-400"
                         }`}
                         onClick={() => selectConversation(index)}
                       >
@@ -363,14 +408,14 @@ const Insight = () => {
                 </div>
               </div>
 
-              <div className="w-2/3 h-full flex flex-col">
-                <div className="w-full flex justify-between items-center px-2 pt-2 pb-3 text-white">
+              <div className="w-2/5 h-full flex flex-col">
+                <div className="w-full flex justify-between items-center px-2 h-14 text-white border-b border-[#393E46]">
                   <span className="text-sm text-gray-400">
                     Messages: {selectedConversation?.messages?.length}
                   </span>
                   <div
                     onClick={saveConversation}
-                    className="cursor-pointer border border-[#393E46] hover:border-[#00ADB5] rounded py-1 px-2 duration-300 flex items-center"
+                    className="cursor-pointer hover:bg-[#4B5C78] duration-100 rounded py-1 px-2 flex items-center"
                   >
                     {selectedConversation?.saved ? (
                       <FontAwesomeIcon icon={faBookmark} className="mr-2" /> // solid bookmark when saved
@@ -387,49 +432,47 @@ const Insight = () => {
                     (message: any, index: number) => (
                       <div
                         key={index}
-                        className={`p-4 flex justify-start items-start ${
+                        className={`p-4 flex flex-col justify-start items-start ${
                           message.role === "user"
-                            ? "bg-[#2E3743]"
-                            : "bg-[#3F4B5B]"
+                            ? ""
+                            : "hover:bg-[#4B5C78] cursor-pointer duration-100"
+                        } ${
+                          message.messageId === selectedMessage?.messageId &&
+                          "bg-[#4B5C78]"
                         }`}
+                        onClick={() => handleSelectMessage(message, index)}
                       >
                         <div className="flex-shrink-0 mr-4">
-                          {" "}
                           {/* Apply flex-shrink-0 here */}
-                          <FontAwesomeIcon
-                            icon={message.role === "user" ? faUser : faRobot}
-                            className="w-5 h-5 border border-[#393E46] rounded p-1" // Ensuring the icon size is fixed
-                          />
+                          {message.role === "user" ? (
+                            <FontAwesomeIcon
+                              icon={faUser}
+                              className="w-5 h-5" // Ensuring the icon size is fixed
+                            />
+                          ) : (
+                            <Image
+                              src="/flexibel-robot.svg"
+                              alt="My SVG"
+                              width={30}
+                              height={35}
+                              className="mb-2"
+                            />
+                          )}
                         </div>
                         <div className="flex-grow">
                           {message.content}
                           {message.role === "response" && (
                             <>
-                              <hr className="my-2 border-[#4E5D70]" />
-                              <div>Feedback: {message.likeStatus}</div>
-                              <hr className="my-2 border-[#4E5D70]" />
-                              <div className="flex flex-col flex-wrap gap-2">
-                                <span>Sources:</span>
-                                <div>
-                                  {message.sources?.map(
-                                    (source: any, sourceIndex: number) => (
-                                      <a
-                                        key={sourceIndex}
-                                        href={
-                                          isValidHttpUrl(source) ? source : null
-                                        }
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-3 py-1 mr-1 w-fit rounded border border-[#4E5D70]"
-                                      >
-                                        {isValidHttpUrl(source)
-                                          ? displayFromUrl(source)
-                                          : source}
-                                      </a>
-                                    )
+                              {message.likeStatus && (
+                                <>
+                                  <hr className="my-2 border-none" />
+                                  {message.likeStatus === "like" ? (
+                                    <FontAwesomeIcon icon={faThumbsUp} />
+                                  ) : (
+                                    <FontAwesomeIcon icon={faThumbsDown} />
                                   )}
-                                </div>
-                              </div>
+                                </>
+                              )}
                             </>
                           )}
                         </div>
@@ -438,6 +481,105 @@ const Insight = () => {
                   )}
                 </div>
               </div>
+              {selectedMessage ? (
+                <div className="w-2/5 h-full flex flex-col border-l border-[#393E46]">
+                  <div className="h-14 flex items-center border-b border-[#393E46]">
+                    <span className="ml-2 text-gray-400">Sources</span>
+                  </div>
+                  <div className="flex-grow overflow-y-auto mx-2">
+                    {/* Display sources of the selected message */}
+                    {selectedMessage?.sources?.map(
+                      (source: any, sourceIndex: number) => (
+                        <div
+                          key={sourceIndex}
+                          onClick={() => {
+                            if (source === selectedSource) {
+                              setSelectedSource("");
+                            } else {
+                              setSelectedSource(source);
+                            }
+                          }}
+                          className={`cursor-pointer p-2 flex items-center justify-between text-gray-400 hover:bg-[#4B5C78] ${
+                            selectedSource === source &&
+                            "bg-[#4B5C78] text-white"
+                          }`}
+                        >
+                          <a
+                            onClick={(e) => e.stopPropagation()}
+                            href={isValidHttpUrl(source) ? source : null}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-fit flex items-center"
+                          >
+                            <FontAwesomeIcon
+                              icon={faExternalLinkAlt}
+                              size="sm"
+                              className="mr-2"
+                            />
+                            <div>{displayFromUrl(source)}</div>
+                          </a>
+                          <FontAwesomeIcon
+                            icon={faChevronLeft}
+                            className={`mx-2 duration-100 ${
+                              selectedSource === source && "-rotate-90"
+                            }`}
+                          />
+                        </div>
+                      )
+                    )}
+                    <div className="mt-20 mx-2">
+                      <div className="space-y-1 text-gray-400 flex flex-col">
+                        <span>
+                          {selectedMessage?.improvedAnswer
+                            ? "Update the improved answer"
+                            : "Create an improved Answer"}
+                        </span>
+                        <span className="text-sm">
+                          The chatbot will use it to better answer similar
+                          questions in the future
+                        </span>
+                      </div>
+                      <div className="flex flex-col mt-8">
+                        <span className="text-gray-400">Question</span>
+                      </div>
+                      <input
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        className="outline-none text-sm w-full mt-1 p-2 bg-[#222831] border border-[#393E46] focus:border-[#4B5C78] rounded"
+                        placeholder="Type question here..."
+                      />
+                    </div>
+                    <div className="mt-4 mx-2">
+                      <div className="flex flex-col">
+                        <span className="text-gray-400">Improved answer</span>
+                        <span className="text-xs text-gray-400">
+                          This will improve answers to similar questions in the
+                          future
+                        </span>
+                      </div>
+                      <textarea
+                        value={answer}
+                        onChange={(e) => setAnswer(e.target.value)}
+                        className="outline-none text-sm w-full h-28 mt-1 p-2 bg-[#222831] border border-[#393E46] focus:border-[#4B5C78] rounded"
+                        placeholder="Type the improved answer here..."
+                      />
+                    </div>
+                    <button
+                      onClick={handleCreateImprovedAnswer}
+                      className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100"
+                    >
+                      <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                      {selectedMessage?.improvedAnswer
+                        ? "Update improved answer"
+                        : "Create improved Answer"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-2/5 h-full border-l border-[#393E46] flex justify-center items-center">
+                  Select a message to view sources
+                </div>
+              )}
             </div>
           </div>
         </div>

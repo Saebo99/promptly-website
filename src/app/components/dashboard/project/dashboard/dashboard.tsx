@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
 import CurrentModelOverview from "./current-model-overview";
-import APIKeyOverview from "./api-key-overview";
+import ClientKey from "./client-key";
 import QuickStartProgress from "./quick-start-progress/quick-start-progress";
 import TeamOverview from "./team-overview";
 import TopBar from "./top-bar";
@@ -32,17 +32,17 @@ const Dashboard = () => {
           <TopBar />
           <div className="h-full w-full flex flex-col items-center overflow-y-scroll">
             <div className="flex flex-grow w-full h-full">
-              <div className="w-1/2 p-2 ml-2" style={{ height: "465px" }}>
+              <div className="w-1/2 p-2 ml-2" style={{ height: "500px" }}>
                 <TeamOverview />
               </div>
               <div
                 className="w-1/2 p-2 mr-2 flex flex-col space-y-4"
-                style={{ height: "465px" }}
+                style={{ height: "500px" }}
               >
-                <div className="h-1/3">
-                  <APIKeyOverview />
+                <div className="h-2/5">
+                  <ClientKey />
                 </div>
-                <div className="h-2/3">
+                <div className="h-3/5">
                   <CurrentModelOverview />
                 </div>
               </div>

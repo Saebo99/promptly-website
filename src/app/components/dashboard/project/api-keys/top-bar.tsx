@@ -7,12 +7,14 @@ interface TopBarProps {
   handleDeleteKeys: () => void;
   selectedKeys: string[];
   apiKeys: any[];
+  setCreatingApiKey: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
   handleDeleteKeys,
   selectedKeys,
   apiKeys,
+  setCreatingApiKey,
 }) => {
   const [canDelete, setCanDelete] = useState(false);
 
@@ -36,7 +38,10 @@ const TopBar: React.FC<TopBarProps> = ({
       </div>
       <div className="flex space-x-2">
         <div className="flex items-center space-x-4">
-          <button className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300">
+          <button
+            onClick={() => setCreatingApiKey(true)}
+            className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             <span>Create new key</span>
           </button>

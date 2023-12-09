@@ -116,42 +116,6 @@ const TopBar: React.FC<TopBarProps> = ({
           {`Finetune your chatbot to match your brand's voice and personality.`}
         </p>
       </div>
-      <div className="flex items-center space-x-4">
-        <Select
-          options={models}
-          styles={customStyles}
-          onChange={handleModelChange} // Pass the handleModelChange function here
-          value={selectedModel}
-        />
-        <button
-          onClick={() => {
-            handleCreateNewModel(true);
-          }}
-          className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300"
-        >
-          Save as new model
-        </button>
-        <button
-          onClick={() => {
-            handleCreateNewModel();
-          }}
-          className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300"
-        >
-          Create
-        </button>
-        <button
-          onClick={handleUpdateModel}
-          className="px-4 py-2 rounded border border-[#00ADB5] bg-[#00ADB5] transition duration-300"
-        >
-          Deploy
-        </button>
-        <button
-          onClick={handleDeleteModel}
-          className="px-4 py-2 rounded border border-red-500 bg-[#222831] hover:bg-red-500 transition duration-300"
-        >
-          Delete
-        </button>
-      </div>
     </div>
   );
 };

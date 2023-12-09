@@ -47,9 +47,8 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
   }, [generatedPrompt]);
 
   return (
-    <div className="w-full h-full flex flex-col shadow-lg p-4 border border-[#393E46] rounded-lg bg-[#222831] text-white">
-      <div className="border-b border-white flex flex-col space-y-1 py-2">
-        <h2 className="text-xl font-bold">Prompt</h2>
+    <div className="w-full max-w-[1000px] h-full my-8 flex flex-col p-4 bg-[#222831] text-white">
+      <div className="border-b border-[#4B5C78] flex flex-col space-y-1 py-2">
         <span className="text-xs text-gray-300">
           The prompt must contain these items for the model to work properly:
         </span>
@@ -67,14 +66,16 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder="Enter a prompt for your chatbot"
-        className="flex-1 outline-none rounded bg-[#222831] mt-4"
+        className="flex-1 outline-none rounded bg-[#222831] pr-4 mt-4"
       ></textarea>
-      <button
-        onClick={() => dispatch(setUsingPromptEngineer(true))}
-        className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300"
-      >
-        Use prompt engineer
-      </button>
+      <div className="mt-8">
+        <button
+          onClick={() => dispatch(setUsingPromptEngineer(true))}
+          className="px-4 py-2 w-fit rounded bg-[#4B5C78] hover:bg-[#394861] transition duration-100"
+        >
+          Use prompt engineer
+        </button>
+      </div>
     </div>
   );
 };

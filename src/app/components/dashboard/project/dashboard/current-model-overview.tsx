@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
+
+import { usePathname, useRouter } from "next/navigation"; // <-- Adjusted import path
+
 import { useSelector } from "react-redux";
+import { selectModelId } from "../../../../../../redux/slices/modelSlice";
 
 import { db } from "@/app/firebase/firebaseClient";
-import { selectModelId } from "../../../../../../redux/slices/modelSlice";
 import { getDoc, doc } from "firebase/firestore";
 
 const CurrentModelOverview = () => {
+  const pathname = usePathname();
+  const router = useRouter();
   const modelId = useSelector(selectModelId);
   const [model, setModel] = useState<any>(null);
 
@@ -41,7 +46,10 @@ const CurrentModelOverview = () => {
                 The AI model that will be used to generate responses
               </span>
             </div>
-            <div className="border border-[#393E46] rounded px-2 py-1">
+            <div
+              onClick={() => router.push(`${pathname}/workshop`)}
+              className="cursor-pointer hover:bg-[#4B5C78] rounded px-2 py-1"
+            >
               {model.modelType}
             </div>
           </div>
@@ -52,7 +60,10 @@ const CurrentModelOverview = () => {
                 The name of your chatbot
               </span>
             </div>
-            <div className="border border-[#393E46] rounded px-2 py-1">
+            <div
+              onClick={() => router.push(`${pathname}/workshop`)}
+              className="cursor-pointer hover:bg-[#4B5C78] rounded px-2 py-1"
+            >
               {model.name}
             </div>
           </div>
@@ -63,7 +74,10 @@ const CurrentModelOverview = () => {
                 The maximum number of characters in a response
               </span>
             </div>
-            <div className="border border-[#393E46] rounded px-2 py-1">
+            <div
+              onClick={() => router.push(`${pathname}/workshop`)}
+              className="cursor-pointer hover:bg-[#4B5C78] rounded px-2 py-1"
+            >
               {model.responseLength}
             </div>
           </div>
@@ -74,7 +88,10 @@ const CurrentModelOverview = () => {
                 The higher the temperature, the more random the response
               </span>
             </div>
-            <div className="border border-[#393E46] rounded px-2 py-1">
+            <div
+              onClick={() => router.push(`${pathname}/workshop`)}
+              className="cursor-pointer hover:bg-[#4B5C78] rounded px-2 py-1"
+            >
               {model.temperature}
             </div>
           </div>

@@ -42,9 +42,9 @@ const DonutDisplay: React.FC<DonutDisplayProps> = ({
     datasets: [
       {
         data: [subTotal, total - subTotal],
-        backgroundColor: ["#00ADB5", "#393E46"],
-        hoverBackgroundColor: ["#008086", "#2B2F35"],
-        borderWidth: 1,
+        backgroundColor: ["#4B5C78", "#393E46"],
+        hoverBackgroundColor: ["#4B5C78", "#2B2F35"],
+        borderWidth: 0,
         // Explicitly set datalabels to false if the plugin is registered
         datalabels: {
           display: false,

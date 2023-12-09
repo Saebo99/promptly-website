@@ -32,10 +32,10 @@ const Workshop: React.FC<WorkshopProps> = ({
       minWidth: 200,
       backgroundColor: "#222831",
       color: "white",
-      borderColor: "#00ADB5", // border
+      borderColor: "#4B5C78", // border
       boxShadow: "none", // Remove box shadow on focus
       "&:hover": {
-        borderColor: "#00ADB5", // border on hover
+        borderColor: "#4B5C78", // border on hover
       },
     }),
     menu: (provided: any) => ({
@@ -44,7 +44,7 @@ const Workshop: React.FC<WorkshopProps> = ({
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#444" : "#2c2c2c",
+      backgroundColor: state.isFocused ? "#4B5C78" : "#222831",
       color: "white",
     }),
     singleValue: (provided: any) => ({
@@ -53,11 +53,11 @@ const Workshop: React.FC<WorkshopProps> = ({
     }),
     dropdownIndicator: (provided: any) => ({
       ...provided,
-      color: "skyBlue", // chevron
+      color: "#4B5C78", // chevron
     }),
     indicatorSeparator: (provided: any) => ({
       ...provided,
-      backgroundColor: "skyBlue", // separator line, if visible
+      backgroundColor: "#4B5C78", // separator line, if visible
     }),
   };
 
@@ -80,7 +80,7 @@ const Workshop: React.FC<WorkshopProps> = ({
         <input
           type="text"
           placeholder="Model Name"
-          className="bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#00ADB5] w-96 text-2xl font-semibold"
+          className="bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#4B5C78] w-96 text-2xl font-semibold"
           value={modelName}
           onChange={(e) => setModelName(e.target.value)}
         />
@@ -114,8 +114,8 @@ const Workshop: React.FC<WorkshopProps> = ({
           step={0.1}
           value={temperature}
           onChange={(value) => setTemperature(value as number)}
-          trackStyle={{ backgroundColor: "#00ADB5" }}
-          handleStyle={{ backgroundColor: "#000000", borderColor: "#00ADB5" }}
+          trackStyle={{ backgroundColor: "#4B5C78" }}
+          handleStyle={{ backgroundColor: "#000000", borderColor: "#4B5C78" }}
         />
 
         <div className="text-center">{temperature}</div>
@@ -132,8 +132,8 @@ const Workshop: React.FC<WorkshopProps> = ({
           step={200}
           value={responseLength}
           onChange={(value) => setResponseLength(value as number)}
-          trackStyle={{ backgroundColor: "#00ADB5" }}
-          handleStyle={{ backgroundColor: "#000000", borderColor: "#00ADB5" }}
+          trackStyle={{ backgroundColor: "#4B5C78" }}
+          handleStyle={{ backgroundColor: "#000000", borderColor: "#4B5C78" }}
         />
 
         <div className="text-center">{responseLength} characters</div>

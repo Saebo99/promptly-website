@@ -8,12 +8,15 @@ import { faArrowLeft } from "@fortawesome/pro-solid-svg-icons";
 
 import { ingestData } from "@/app/utils/ingestData";
 
+import { ingestVideo } from "@/app/utils/ingestVideo";
+
 import { getAPIKeys } from "@/app/utils/getAPIKeys";
 
 import { ingestFile } from "@/app/utils/ingestFile";
 
 import URLImport from "./source-input-fields/url-import";
 import FileImport from "./source-input-fields/file-import";
+import VideoImport from "./source-input-fields/video-import";
 import LoadingAnimation from "../../loading-animation/loading-animation";
 
 interface SourceImportProps {
@@ -45,6 +48,12 @@ const SourceImport: React.FC<SourceImportProps> = ({ source, setSource }) => {
       data.crawlType,
       apiKey
     );
+    setLoading(false);
+  };
+
+  const handleVideoImport = async (url: string) => {
+    setLoading(true);
+    await ingestVideo(url, apiKey);
     setLoading(false);
   };
 
@@ -82,8 +91,10 @@ const SourceImport: React.FC<SourceImportProps> = ({ source, setSource }) => {
           </div>
           {source === "URL" ? (
             <URLImport onImport={handleURLImport} />
-          ) : (
+          ) : source === "File" ? (
             <FileImport onImport={handleFileImport} />
+          ) : (
+            <VideoImport onImport={handleVideoImport} />
           )}
         </div>
       )}

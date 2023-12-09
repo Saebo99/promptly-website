@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PromptlyAdapt, FloatingButton } from "chat-promptly";
+import { FlexibelAdapt, FloatingButton } from "flexibel";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -24,8 +24,12 @@ import {
 
 import { useProjectListener } from "@/app/hooks/useProjectListener";
 import { getAPIKeys } from "@/app/utils/getAPIKeys";
+import { getClientKey } from "@/app/utils/getClientKey";
 
 import LoadingAnimation from "../../loading-animation/loading-animation";
+import TabSelection from "./tab-selection";
+import Overview from "./overview";
+import Design from "./design";
 import LoadingChatBot from "./loading-chatbot";
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
@@ -67,12 +71,10 @@ const Workshop = () => {
   const projectId = useSelector(selectProjectId);
   const usingPromptEngineer = useSelector(selectUsingPromptEngineer);
 
+  const tabs = ["Overview", "Configuration", "Design", "Prompt"]; // Add more tab names as needed
+  const [selectedTab, setSelectedTab] = useState(tabs[0]);
   const [loading, setLoading] = useState(true);
   // State variables for storing the model's initial values
-  const [modelType, setModelType] = useState<{
-    value: string;
-    label: string;
-  }>({ value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" });
   const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
   const [temperature, setTemperature] = useState(0);
@@ -85,11 +87,27 @@ const Workshop = () => {
   );
   const [key, setKey] = useState<number>(0);
   const [chatBotUpdating, setChatBotUpdating] = useState<boolean>(false);
-
-  const modelOptions = [
-    { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
-    { value: "gpt-4", label: "gpt-4" },
-  ];
+  const models = ["gpt-3.5-turbo", "gpt-4"];
+  const [currentModel, setCurrentModel] = useState<string>(models[0]);
+  const [selectedColors, setSelectedColors] = useState<{
+    background: string;
+    buttonBackground: string;
+    text: string;
+    buttonText: string;
+    inputBackground: string;
+    inputText: string;
+    aiIcon: string;
+    userIcon: string;
+  }>({
+    background: "",
+    buttonBackground: "",
+    text: "",
+    buttonText: "",
+    inputBackground: "",
+    inputText: "",
+    aiIcon: "",
+    userIcon: "",
+  });
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -97,6 +115,35 @@ const Workshop = () => {
       setLoading(false);
     }, 1000);
   }, []);
+
+  useEffect(() => {
+    const getModelColors = async () => {
+      if (modelId) {
+        try {
+          const docRef = doc(db, "models", modelId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log("Document data: ", data);
+            setSelectedColors(
+              data.colorSettings || {
+                background: "",
+                buttonBackground: "",
+                text: "",
+                buttonText: "",
+                inputBackground: "",
+                inputText: "",
+              }
+            ); // Use the entire object or fallback to defaults
+          }
+        } catch (error) {
+          console.error("Error fetching model data:", error);
+        }
+      }
+    };
+
+    getModelColors();
+  }, [modelId]);
 
   useEffect(() => {
     if (currentProject) {
@@ -109,8 +156,8 @@ const Workshop = () => {
 
   useEffect(() => {
     const fetchAPIKeys = async () => {
-      const keys = await getAPIKeys(projectId);
-      setApiKey(keys[0].decryptedKey);
+      const decryptedKey = await getClientKey(projectId);
+      setApiKey(decryptedKey || "");
     };
 
     if (projectId) {
@@ -127,15 +174,12 @@ const Workshop = () => {
 
       if (modelDoc.exists()) {
         const modelData = modelDoc.data();
-        setModelType({
-          value: modelData.modelType || "",
-          label: modelData.modelType || "",
-        });
+        setCurrentModel(modelData.modelType || "");
         setName(modelData.name || "");
         setPrompt(modelData.prompt || "");
         setTemperature(modelData.temperature || 0);
         setResponseLength(modelData.responseLength || 0);
-        setSuggestedMessages(modelData.suggestedMessages.join(", ") || "");
+        setSuggestedMessages(modelData.suggestedMessages?.join(", ") || "");
       }
     };
 
@@ -149,7 +193,7 @@ const Workshop = () => {
       let newModelData;
       if (saveAsNew) {
         newModelData = {
-          modelType: modelType.value,
+          modelType: currentModel,
           name: name,
           prompt: prompt,
           temperature: temperature,
@@ -244,7 +288,7 @@ const Workshop = () => {
 
       // Prepare the update data
       const updateData = {
-        modelType: modelType.value,
+        modelType: currentModel,
         name: name,
         prompt: prompt,
         temperature: temperature,
@@ -292,7 +336,6 @@ const Workshop = () => {
           backgroundColor: "#00ADB5",
           color: "#ffffff",
         }}
-        separatorColor="#393E46"
       />
       <Sidebar />
       {loading ? (
@@ -310,73 +353,91 @@ const Workshop = () => {
             handleUpdateModel={handleUpdateModel}
           />
           <div className="flex flex-grow space-x-4 mb-4 mx-4">
-            <div className="w-[400px] h-full">
-              <PromptEditor
-                modelId={modelId}
-                prompt={prompt}
-                setPrompt={setPrompt}
-              />
-            </div>
-            <div className="flex-1 h-fit flex justify-center">
+            <div className="w-[60%] mt-10 h-fit flex justify-center">
               {chatBotUpdating ? (
                 <LoadingChatBot />
               ) : (
-                <PromptlyAdapt
+                <FlexibelAdapt
                   key={key}
                   apiKey={apiKey}
-                  aiIconColor="#00ADB5"
-                  aiColor="#ffffff"
+                  aiIconColor={selectedColors.aiIcon}
+                  aiColor={selectedColors.buttonBackground}
+                  userIconColor={selectedColors.userIcon}
+                  userColor={selectedColors.buttonBackground}
                   chatStyle={{
-                    backgroundColor: "#222831",
-                    border: "1px solid #00ADB5",
-                    color: "#ffffff",
+                    backgroundColor: selectedColors.background,
+                    color: selectedColors.text,
                   }}
                   inputFieldStyle={{
-                    backgroundColor: "#222831",
-                    color: "#ffffff",
+                    backgroundColor: selectedColors.inputBackground,
+                    border: `1px solid ${selectedColors.inputBackground}`,
+                    color: selectedColors.inputText,
                   }}
                   askButtonStyle={{
-                    backgroundColor: "#00adb5",
-                    color: "#ffffff",
+                    backgroundColor: selectedColors.buttonBackground,
+                    color: selectedColors.buttonText,
                   }}
                   chatButtonStyle={{
-                    backgroundColor: "#00ADB5",
-                    color: "#ffffff",
+                    backgroundColor: selectedColors.buttonBackground,
+                    color: selectedColors.buttonText,
                   }}
-                  separatorColor="#393E46"
                   suggestedQuestionsStyle={{
-                    backgroundColor: "#00ADB5",
-                    color: "#fff",
+                    backgroundColor: selectedColors.inputBackground,
                   }}
-                  userIconColor="#ffffff"
                   suggestedQuestions={
                     suggestedMessages.trim().length > 0
                       ? suggestedMessages.split(",").map((str) => str.trim())
-                      : [apiKey]
+                      : ["How are you?", "What's your name?"]
                   }
                   welcomeMessage={initialMessage}
                 />
               )}
             </div>
-            <div className="">
-              <ModelConfigurator
-                modelType={modelType}
-                setModelType={setModelType}
-                modelName={name}
-                setModelName={setName}
-                modelOptions={modelOptions}
-                temperature={temperature}
-                setTemperature={setTemperature}
-                responseLength={responseLength}
-                setResponseLength={setResponseLength}
-                suggestedMessages={suggestedMessages}
-                setSuggestedMessages={setSuggestedMessages}
-                initialMessage={initialMessage}
-                setInitialMessage={setInitialMessage}
-                updateChatBot={() => {
-                  setKey((prevKey) => prevKey + 1);
-                }}
+            <div className="w-[40%] my-10 flex flex-col items-center">
+              <TabSelection
+                tabs={tabs}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
               />
+              {selectedTab === "Configuration" ? (
+                <ModelConfigurator
+                  modelName={name}
+                  setModelName={setName}
+                  models={models}
+                  currentModel={currentModel}
+                  setCurrentModel={setCurrentModel}
+                  temperature={temperature}
+                  setTemperature={setTemperature}
+                  responseLength={responseLength}
+                  setResponseLength={setResponseLength}
+                  suggestedMessages={suggestedMessages}
+                  setSuggestedMessages={setSuggestedMessages}
+                  initialMessage={initialMessage}
+                  setInitialMessage={setInitialMessage}
+                  updateChatBot={() => {
+                    setKey((prevKey) => prevKey + 1);
+                  }}
+                />
+              ) : selectedTab === "Prompt" ? (
+                <PromptEditor
+                  modelId={modelId}
+                  prompt={prompt}
+                  setPrompt={setPrompt}
+                />
+              ) : selectedTab === "Design" ? (
+                <Design
+                  selectedColors={selectedColors}
+                  setSelectedColors={setSelectedColors}
+                />
+              ) : (
+                <Overview
+                  modelIds={modelIds}
+                  modelId={modelId}
+                  handleCreateNewModel={handleCreateNewModel}
+                  handleDeleteModel={handleDeleteModel}
+                  handleUpdateModel={handleUpdateModel}
+                />
+              )}
             </div>
           </div>
         </div>

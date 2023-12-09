@@ -7,6 +7,7 @@ import { setModelId } from "../../../../redux/slices/modelSlice";
 import {
   setProjectId,
   setProjectIdentifier,
+  setCurrentProject,
 } from "../../../../redux/slices/projectSlice";
 
 import { db } from "@/app/firebase/firebaseClient";
@@ -77,6 +78,7 @@ const ProjectsOverview = () => {
               localStorage.setItem("projectId", project.id);
               dispatch(setProjectId(project.id));
               dispatch(setProjectIdentifier(project.projectIdentifier));
+              dispatch(setCurrentProject(project));
               const modelsObject = project.models;
               console.log("modelsObject: ", modelsObject);
 
@@ -97,17 +99,17 @@ const ProjectsOverview = () => {
 
               router.push(`/app/${project.projectIdentifier}`);
             }}
-            className="cursor-pointer flex flex-col justify-between h-60 w-80 p-4 shadow-md rounded-lg border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] duration-300"
+            className="cursor-pointer flex flex-col justify-between h-60 w-80 p-4 shadow-md rounded-lg border border-[#393E46] bg-[#222831] hover:bg-[#4B5C78] duration-100"
           >
             <h2 className="text-xl font-semibold">{project.name}</h2>
-            <p className="text-sm">{project.id}</p>
+            <p className="text-sm">{project.projectIdentifier}</p>
           </div>
         ))}
         <div
           onClick={() => {
             router.push("/app/project-creator/");
           }}
-          className="cursor-pointer flex items-center justify-center w-80 h-60 p-4 shadow-md rounded-lg border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] duration-300"
+          className="cursor-pointer flex items-center justify-center w-80 h-60 p-4 shadow-md rounded-lg border border-[#393E46] bg-[#222831] hover:bg-[#4B5C78] duration-100"
         >
           <FontAwesomeIcon icon={faPlus} size="2x" />
         </div>

@@ -1,74 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
+
+import { useSelector } from "react-redux";
+import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSort } from "@fortawesome/pro-regular-svg-icons";
+import { faTrash, faCheck, faTimes } from "@fortawesome/pro-regular-svg-icons";
 
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { deleteAPIKey } from "@/app/utils/deleteAPIKey";
 
 type Key = {
   id: string;
   name: string;
   decryptedKey: string;
   createdAt: string;
-  lastUsedAt: string;
 };
 
 interface KeyTableProps {
   keys: Key[];
-  selectedKeys: any;
-  setSelectedKeys: any;
 }
 
-const KeyTable: React.FC<KeyTableProps> = ({
-  keys,
-  selectedKeys,
-  setSelectedKeys,
-}) => {
-  const columnHelper = createColumnHelper<Key>();
-  const columns = [
-    columnHelper.accessor("id", {
-      cell: (info) => (
-        <input
-          type="checkbox"
-          checked={selectedKeys.includes(info.row.original.decryptedKey)}
-          onChange={(e) =>
-            handleSelectKey(info.row.original.decryptedKey, e.target.checked)
-          }
-        />
-      ),
-      header: () => (
-        <input
-          type="checkbox"
-          checked={selectedKeys.length === keys.length}
-          onChange={handleSelectAllKeys}
-        />
-      ),
-    }),
-    columnHelper.accessor("name", {
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("decryptedKey", {
-      cell: (info) => formatDecryptedKey(info.getValue()),
-    }),
-    columnHelper.accessor("createdAt", {
-      cell: (info) => formatDate(info.getValue()),
-    }),
-    columnHelper.accessor("lastUsedAt", {
-      cell: (info) => formatDate(info.getValue()),
-    }),
-  ];
+type KeyWithDeletionState = Key & { isDeleting: boolean };
 
-  const table = useReactTable({
-    data: keys,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+const KeyTable: React.FC<KeyTableProps> = ({ keys }) => {
+  const projectId = useSelector(selectProjectId);
+  const [keysWithDeletionState, setKeysWithDeletionState] = useState<
+    KeyWithDeletionState[]
+  >(keys.map((key) => ({ ...key, isDeleting: false })));
 
+  const handleDeleteClick = (id: string) => {
+    setKeysWithDeletionState((currentKeys) =>
+      currentKeys.map((key) =>
+        key.decryptedKey === id ? { ...key, isDeleting: !key.isDeleting } : key
+      )
+    );
+  };
+
+  const confirmDelete = async (id: string) => {
+    await deleteAPIKey(projectId, id);
+    setKeysWithDeletionState((currentKeys) =>
+      currentKeys.filter((key) => key.decryptedKey !== id)
+    );
+  };
   // Utility function to format the date and time
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -77,72 +49,66 @@ const KeyTable: React.FC<KeyTableProps> = ({
 
   // Utility function to format the decryptedKey
   const formatDecryptedKey = (decryptedKey: string) => {
-    if (decryptedKey.length > 6) {
-      const firstThree = decryptedKey.substring(0, 3);
+    if (decryptedKey.length > 10) {
+      const firstFour = decryptedKey.substring(0, 4);
       const lastThree = decryptedKey.substring(decryptedKey.length - 3);
-      const maskedSection = "*".repeat(decryptedKey.length - 6);
-      return `${firstThree}${maskedSection}${lastThree}`;
+      return `${firstFour}***${lastThree}`;
     }
-    return decryptedKey; // return as is if the key is too short to mask
-  };
-
-  const handleSelectKey = (id: string, isSelected: boolean) => {
-    setSelectedKeys((prevSelectedKeys: string[]) => {
-      if (isSelected) {
-        // If the checkbox is checked, add the key's id to the array
-        return [...prevSelectedKeys, id];
-      } else {
-        // If the checkbox is unchecked, remove the key's id from the array
-        return prevSelectedKeys.filter((keyId: string) => keyId !== id);
-      }
-    });
-  };
-
-  // Function to handle selection of all keys
-  const handleSelectAllKeys = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedKeys(
-      e.target.checked ? keys.map((key) => key.decryptedKey) : []
-    );
+    return decryptedKey;
   };
 
   return (
-    <div className="bg-[#222831] w-full h-fit border border-[#393E46] rounded">
-      <table className="w-full">
-        <thead className="">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr
-              key={headerGroup.id}
-              className="transition-colors hover:bg-[#393E46]"
-            >
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="text-left border-b p-4 border-[#393E46] text-white"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  <FontAwesomeIcon icon={faSort} className="ml-2" />
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="transition-colors hover:bg-[#393E46]">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-4 border-[#393E46] text-white">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-[#222831] w-fit h-fit border border-[#393E46] rounded">
+      <div
+        className="grid grid-cols-4 text-white font-semibold p-4"
+        style={{ gridTemplateColumns: "200px 200px 200px 50px" }}
+      >
+        <div>Name</div>
+        <div>Key</div>
+        <div>Created At</div>
+        <div>Action</div>
+      </div>
+      {keysWithDeletionState.map((key, index) => (
+        <div
+          key={key.decryptedKey}
+          className={`grid grid-cols-4 p-4 ${
+            index !== 0 ? "border-t border-[#393E46]" : ""
+          }`}
+          style={{ gridTemplateColumns: "200px 200px 200px 50px" }}
+        >
+          <div>{key.name}</div>
+          <div className="text-gray-400">
+            {formatDecryptedKey(key.decryptedKey)}
+          </div>
+          <div className="text-gray-400">{formatDate(key.createdAt)}</div>
+          <div className="w-full flex justify-center">
+            {!key.isDeleting ? (
+              <FontAwesomeIcon
+                icon={faTrash}
+                className="text-gray-400 hover:text-red-500 duration-300 cursor-pointer"
+                onClick={() => handleDeleteClick(key.decryptedKey)}
+              />
+            ) : (
+              <div className="flex items-center">
+                <div className="flex justify-center items-center bg-red-500 text-white cursor-pointer mr-2 w-7 h-7 border border-red-500 rounded hover:bg-red-600 hover:border-red-600 duration-300">
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    size="sm"
+                    onClick={() => confirmDelete(key.decryptedKey)}
+                  />
+                </div>
+                <div className="flex justify-center items-center bg-[#393E46] text-white cursor-pointer mr-2 w-7 h-7 border border-[#393E46] rounded hover:bg-[#30353D] hover:border-[#30353D] duration-300">
+                  <FontAwesomeIcon
+                    icon={faTimes}
+                    size="sm"
+                    onClick={() => handleDeleteClick(key.decryptedKey)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

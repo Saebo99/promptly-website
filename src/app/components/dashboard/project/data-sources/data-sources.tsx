@@ -6,12 +6,9 @@ import { collection, getDocs, doc } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
 
-import { deleteData } from "@/app/utils/deleteData";
-import { getAPIKeys } from "@/app/utils/getAPIKeys";
-
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
-import SourcesTable from "./sources-table";
+import WebsiteSources from "./website-sources";
 import TopBar from "./top-bar";
 import DataImport from "../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../loading-animation/loading-animation";
@@ -27,22 +24,9 @@ type Source = {
 
 const DataSources = () => {
   const projectId = useSelector(selectProjectId);
-  const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
-  const [apiKey, setApiKey] = useState<string>("");
-
-  useEffect(() => {
-    const fetchAPIKeys = async () => {
-      const keys = await getAPIKeys(projectId);
-      setApiKey(keys[0].decryptedKey);
-    };
-
-    if (projectId) {
-      fetchAPIKeys();
-    }
-  }, [projectId]);
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -50,17 +34,6 @@ const DataSources = () => {
       setLoading(false);
     }, 1000);
   }, []);
-
-  const handleDeleteSources = async () => {
-    if (selectedSources.length > 0) {
-      await deleteData(apiKey, selectedSources);
-    } else {
-      await deleteData(
-        apiKey,
-        sources.map((source) => source.source)
-      );
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,8 +75,6 @@ const DataSources = () => {
           <TopBar
             addingSource={addingSource}
             setAddingSource={setAddingSource}
-            selectedSources={selectedSources}
-            handleDeleteSources={handleDeleteSources}
           />
           <div className="flex flex-grow space-x-4 mb-4 mx-4">
             {addingSource ? (
@@ -111,11 +82,7 @@ const DataSources = () => {
                 <DataImport />
               </div>
             ) : (
-              <SourcesTable
-                sources={sources}
-                selectedSources={selectedSources}
-                setSelectedSources={setSelectedSources}
-              />
+              <WebsiteSources sources={sources} />
             )}
           </div>
         </div>

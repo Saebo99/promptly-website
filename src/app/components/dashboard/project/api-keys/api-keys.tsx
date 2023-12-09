@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy, faCheck } from "@fortawesome/pro-regular-svg-icons";
+
 import { useSelector } from "react-redux";
 import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
 
 import { getAPIKeys } from "@/app/utils/getAPIKeys";
+import { createAPIKey } from "@/app/utils/createAPIKey";
 
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
@@ -24,6 +28,7 @@ const ApiKeys = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]); // State to keep track of selected keys
   const [apiKeys, setApiKeys] = useState<Key[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creatingApiKey, setCreatingApiKey] = useState(false);
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -72,16 +77,112 @@ const ApiKeys = () => {
             handleDeleteKeys={handleDeleteKeys}
             selectedKeys={selectedKeys}
             apiKeys={apiKeys}
+            setCreatingApiKey={setCreatingApiKey}
           />
-          <div className="flex flex-grow space-x-4 mb-4 mx-4">
-            <KeyTable
-              keys={apiKeys}
-              selectedKeys={selectedKeys}
-              setSelectedKeys={setSelectedKeys}
-            />
+          <div className="w-full flex justify-center mt-8">
+            <KeyTable keys={apiKeys} />
           </div>
         </div>
       )}
+      {creatingApiKey && (
+        <CreateApiKey onClose={() => setCreatingApiKey(false)} />
+      )}
+    </div>
+  );
+};
+
+// Modal component for editing project name
+const CreateApiKey = ({ onClose }: any) => {
+  const projectId = useSelector(selectProjectId);
+  const [inputText, setInputText] = useState("");
+  const [apiKey, setApiKey] = useState<string>("");
+  const [copied, setCopied] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleCreateKey = async () => {
+    const newKey = await createAPIKey(
+      projectId,
+      inputText.trim() ? inputText : "New Key"
+    );
+    setApiKey(newKey as string);
+  };
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(apiKey);
+    setCopied(true);
+    // Optionally, you can display a notification to the user that the key has been copied
+  };
+
+  return (
+    <div
+      className="fixed inset-0 w-full h-full flex justify-center items-center"
+      style={{ zIndex: 100 }}
+    >
+      <div
+        onClick={onClose}
+        className="fixed inset-0 w-full h-full bg-black opacity-50"
+      ></div>
+      <div
+        className="bg-[#222831] text-gray-200 p-8 shadow-xl rounded-lg z-50 flex flex-col justify-between items-center text-center"
+        style={{ width: "50%" }}
+      >
+        {!apiKey ? (
+          <>
+            <h1 className="text-2xl font-bold mb-4">Create new key</h1>
+            <span className="w-3/4 text-start">Enter Key name (optional)</span>
+            <input
+              type="text"
+              value={inputText}
+              placeholder="New key"
+              onChange={(e) => setInputText(e.target.value)}
+              className="mb-4 p-2 w-3/4 bg-[#222831] rounded border border-[#393E46] focus:border-[#00ADB5] focus:outline-none"
+            />
+            <div className="space-x-4">
+              <button
+                onClick={handleCreateKey}
+                className="text-white mt-4 py-2 px-4 rounded border border-[#00ADB5] hover:bg-[#00ADB5] duration-300"
+              >
+                Create Key
+              </button>
+              <button
+                onClick={onClose}
+                className="cursor-pointer text-gray-400 hover:text-white duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold mb-4">API Key Created</h1>
+            <p className="mb-4">
+              Keep your newly created API key secret, keep it safe. This is the
+              only time you will be able to see the key for security reasons. If
+              you lose it, you will have to create a new one.
+            </p>
+            <div
+              className={`mb-4 p-2 w-3/4 bg-[#222831] rounded border ${
+                isFocused ? "border-[#00ADB5]" : "border-[#393E46]"
+              } flex justify-between items-center`}
+              onClick={() => setIsFocused(true)}
+              tabIndex={0} // Make it focusable
+            >
+              <span>{apiKey}</span>
+              <FontAwesomeIcon
+                icon={copied ? faCheck : faCopy}
+                onClick={handleCopyToClipboard}
+                className="cursor-pointer"
+              />
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white mt-4 py-2 px-4 rounded border border-[#00ADB5] hover:bg-[#00ADB5] duration-300"
+            >
+              Done
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

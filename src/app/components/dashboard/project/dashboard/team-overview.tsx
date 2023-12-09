@@ -92,7 +92,7 @@ const TeamOverview = () => {
   };
 
   return (
-    <div className="h-full shadow-lg border border-[#393E46] rounded-lg bg-[#222831] p-4 text-white">
+    <div className="h-full flex flex-col justify-between shadow-lg border border-[#393E46] rounded-lg bg-[#222831] p-4 text-white">
       <div>
         <h2 className="text-2xl font-bold">Team</h2>
         <p className="mb-8">
@@ -133,7 +133,7 @@ const TeamOverview = () => {
         />
         <motion.button
           onClick={sendInvite}
-          className="border border-[#00ADB5] hover:bg-[#00ADB5] duration-300 text-white rounded p-2 flex items-center justify-center"
+          className=" hover:bg-[#4B5C78] duration-100 text-white rounded p-2 flex items-center justify-center"
           variants={buttonVariants}
           animate={buttonStatus}
         >

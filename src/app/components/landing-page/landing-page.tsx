@@ -1,13 +1,13 @@
 import React from "react";
 
 import HeroPage from "./hero-page";
-import TheWhy from "./the-why";
+import ConnectData from "./connect-data/connect-data";
 
 const LandingPage = () => {
   return (
     <div>
       <HeroPage />
-      <TheWhy />
+      <ConnectData />
     </div>
   );
 };

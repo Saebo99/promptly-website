@@ -18,7 +18,7 @@ import {
 } from "../../../../../redux/slices/projectSlice";
 import { setModelId } from "../../../../../redux/slices/modelSlice";
 
-import { createAPIKey } from "@/app/utils/createAPIKey";
+import { createClientAPIKey } from "@/app/utils/createClientAPIKey";
 
 import LoadingAnimation from "../loading-animation/loading-animation";
 import DashboardNavbar from "@/app/components/dashboard/project/dashboard-navbar";
@@ -134,8 +134,8 @@ const ProjectCreator = () => {
         dispatch(setProjectIdentifier(tempProjectId));
         dispatch(setModelId(modelDocRef.id));
 
-        // Step 4: Create an api key for the project
-        await createAPIKey(docRef.id);
+        // Step 4: Create a client api key for the project
+        await createClientAPIKey(docRef.id);
 
         // Redirecting to the project page
         router.push(`/app/${tempProjectId}`);
@@ -217,7 +217,7 @@ const ProjectCreator = () => {
               </span>
             )}
             <button
-              className="py-2 px-4 border border-[#00ADB5] text-white rounded hover:bg-[#00ADB5] duration-300"
+              className="py-2 px-4 text-white rounded hover:bg-[#4B5C78] duration-100"
               onClick={handleNextButtonClick}
               disabled={
                 page === "pageone" && (!isProjectNameValid || !isProjectIdValid)

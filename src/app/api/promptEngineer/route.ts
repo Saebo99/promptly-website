@@ -16,7 +16,9 @@ export async function POST(req: Request): Promise<Response> {
       },
       {
         role: "user",
-        content: `Create a prompt for an ai model. Below is an example of a prompt for a customer service model: 
+        content: `YOU ARE A PROMPT CREATOR. 
+
+          Below is an example of a prompt for a customer service model: 
 
             You are a Customer Service Chatbot for the company [company]. Given the context from the useful sources and a question, provide an answer using markdown.
 
@@ -43,6 +45,8 @@ Here is a list of things you need to remember while answering:
 Begin:
 
 
+  THIS IS YOUR TASK AS A PROMPT CREATOR:
+  You are to create a prompt for the customer.
   The prompt must contain these sections:
   [company] - The name of the company you are a customer service chatbot for.
   [chat_history] - The chat history of the conversation so far.

@@ -1,4 +1,7 @@
 import React from "react";
+
+import { motion } from "framer-motion";
+
 import Select from "react-select";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
@@ -6,15 +9,15 @@ import "rc-slider/assets/index.css";
 interface ModelConfiguratorProps {
   modelName: string;
   setModelName: (value: string) => void;
-  modelType: { value: string; label: string };
-  setModelType: (value: { value: string; label: string }) => void;
+  models: string[];
+  currentModel: string;
+  setCurrentModel: (value: string) => void;
   temperature: number;
   setTemperature: (value: number) => void;
   responseLength: number;
   setResponseLength: (value: number) => void;
   suggestedMessages: string;
   setSuggestedMessages: (value: string) => void;
-  modelOptions: { value: string; label: string }[];
   initialMessage: string;
   setInitialMessage: (value: string) => void;
   updateChatBot: () => void;
@@ -23,15 +26,15 @@ interface ModelConfiguratorProps {
 const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
   modelName,
   setModelName,
-  modelType,
-  setModelType,
+  models,
+  currentModel,
+  setCurrentModel,
   temperature,
   setTemperature,
   responseLength,
   setResponseLength,
   suggestedMessages,
   setSuggestedMessages,
-  modelOptions,
   initialMessage,
   setInitialMessage,
   updateChatBot,
@@ -41,10 +44,10 @@ const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
       ...provided,
       backgroundColor: "#222831",
       color: "white",
-      borderColor: "#00ADB5", // border
+      borderColor: "#4B5C78", // border
       boxShadow: "none", // Remove box shadow on focus
       "&:hover": {
-        borderColor: "#00ADB5", // border on hover
+        borderColor: "#4B5C78", // border on hover
       },
     }),
     menu: (provided: any) => ({
@@ -62,50 +65,65 @@ const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
     }),
     dropdownIndicator: (provided: any) => ({
       ...provided,
-      color: "#00ADB5", // chevron
+      color: "#4B5C78", // chevron
     }),
     indicatorSeparator: (provided: any) => ({
       ...provided,
-      backgroundColor: "#00ADB5", // separator line, if visible
+      backgroundColor: "#4B5C78", // separator line, if visible
     }),
   };
 
-  const handleModelTypeChange = (selectedOption: any) => {
-    if (selectedOption) {
-      setModelType(selectedOption);
-    }
+  const findModelIndex = () => {
+    return models.indexOf(currentModel);
   };
 
   return (
-    <div className="w-full h-full shadow-lg p-4 border border-[#393E46] rounded-lg bg-[#222831] text-white flex flex-col">
+    <div className="w-full max-w-[1000px] h-full mt-8 px-4 bg-[#222831] text-white flex flex-col">
       {/* Model Name */}
-      <div className="text-sm">
-        <label className="block mb-1">Model Name:</label>
+      <div className="space-y-2">
+        <label className="text-gray-400">Model Name</label>
         <input
           type="text"
           placeholder="Model Name"
-          className="w-full bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#00ADB5] font-semibold"
+          className="w-full bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#4B5C78] font-semibold"
           value={modelName}
           onChange={(e) => setModelName(e.target.value)}
         />
       </div>
 
       {/* Model Type */}
-      <div className="w-full mt-6 text-sm">
-        <label className="block mb-1">Select Model Type:</label>
-        <Select
-          options={modelOptions}
-          styles={customStyles}
-          value={modelType}
-          onChange={handleModelTypeChange}
-          className="text-black"
-        />
+      <div className="w-full mt-6 space-y-2">
+        <label className="text-gray-400">Select Model Type</label>
+        <div className="flex flex-row items-center relative">
+          <motion.div
+            className="absolute bottom-0 h-full bg-[#4B5C78] rounded w-1/2"
+            initial={false}
+            animate={{ x: `${findModelIndex() * 100}%` }}
+            transition={{ type: "tween", duration: 0.3 }}
+            style={{
+              width: "calc(100% / 2)", // Adjust width based on number of tabs
+              zIndex: 0, // Ensure it's behind the text
+            }}
+          />
+          {models.map((model, index) => (
+            <div
+              key={index}
+              className={`cursor-pointer px-4 py-2 w-full flex justify-center hover:text-white duration-100 ${
+                model === currentModel ? "text-white z-10" : "text-gray-400"
+              }`}
+              onClick={() => setCurrentModel(model)}
+              style={{ zIndex: 1 }} // Ensure text is above the box
+            >
+              {model}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Temperature */}
-      <div className="w-full mt-6 text-sm">
+      <div className="w-full mt-8 space-y-2">
         <div className="flex justify-between items-center mb-1">
-          <label className="block">Temperature</label>
+          <label className="text-gray-400">Temperature</label>
           <div className="">{temperature}</div>
         </div>
 
@@ -115,15 +133,15 @@ const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
           step={0.1}
           value={temperature}
           onChange={(value) => setTemperature(value as number)}
-          trackStyle={{ backgroundColor: "#00ADB5" }}
-          handleStyle={{ backgroundColor: "#000000", borderColor: "#00ADB5" }}
+          trackStyle={{ backgroundColor: "#4B5C78" }}
+          handleStyle={{ backgroundColor: "#000000", borderColor: "#4B5C78" }}
         />
       </div>
 
       {/* Response Length */}
-      <div className="w-full mt-6 text-sm">
+      <div className="w-full mt-8 space-y-2">
         <div className="flex justify-between items-center mb-1">
-          <label className="block">Maximum length</label>
+          <label className="text-gray-400">Maximum length</label>
           <div className="">{responseLength}</div>
         </div>
 
@@ -133,28 +151,28 @@ const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
           step={100}
           value={responseLength}
           onChange={(value) => setResponseLength(value as number)}
-          trackStyle={{ backgroundColor: "#00ADB5" }}
-          handleStyle={{ backgroundColor: "#000000", borderColor: "#00ADB5" }}
+          trackStyle={{ backgroundColor: "#4B5C78" }}
+          handleStyle={{ backgroundColor: "#000000", borderColor: "#4B5C78" }}
         />
       </div>
 
       {/* Suggested Messages */}
-      <div className="w-full mt-6 text-sm">
-        <label className="block mb-1">Suggested Messages:</label>
+      <div className="w-full mt-8 space-y-2">
+        <label className="text-gray-400">Suggested Messages</label>
         <textarea
           rows={3}
           placeholder="e.g., Hi, How can I help?, Is there something you need?"
-          className="w-full p-2 border border-[#393E46] rounded bg-[#393E46] placeholder-gray-300"
+          className="outline-none w-full p-2 rounded bg-[#222831] placeholder-gray-300"
           value={suggestedMessages}
           onChange={(e) => setSuggestedMessages(e.target.value)}
         />
       </div>
-      <div className="w-full mt-6 text-sm">
-        <label className="block mb-1">Initial message:</label>
+      <div className="w-full mt-8 space-y-2">
+        <label className="text-gray-400">Initial message</label>
         <input
           type="text"
           placeholder="Initial message"
-          className="w-full pt-2 bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#00ADB5] font-semibold"
+          className="w-full pt-2 bg-transparent border-b border-[#393E46] focus:outline-none focus:border-[#4B5C78] font-semibold"
           value={initialMessage}
           onChange={(e) => {
             setInitialMessage(e.target.value);

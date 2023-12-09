@@ -95,8 +95,24 @@ const Navbar = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 60 }}
         >
-          <Link href="/" style={{ marginRight: "30%" }}>
-            <div>Promptly</div>
+          <Link
+            href="/"
+            className="flex justify-center items-end"
+            style={{ marginRight: "30%" }}
+          >
+            <Image
+              src="/flexibel-logo.svg"
+              alt="My SVG"
+              width={35}
+              height={35}
+              className="mr-4"
+            />
+            <Image
+              src="/flexibel-text.svg"
+              alt="My SVG"
+              width={170}
+              height={150}
+            />
           </Link>
 
           {/* Uncomment the section below if needed */}
@@ -107,15 +123,17 @@ const Navbar = () => {
       {user ? (
         // User is logged in
         <div className="flex items-center space-x-4">
-          <button className="py-1 px-2 rounded text-white flex items-center border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] transition duration-300">
-            <FontAwesomeIcon icon={faBook} className="mr-2" />
-            Docs
+          <button className="py-1 px-2 rounded text-white flex items-center bg-[#4B5C78] hover:bg-[#222831] transition duration-100">
+            <Link href="https://docs.flexibel.ai">
+              <FontAwesomeIcon icon={faBook} className="mr-2" />
+              Docs
+            </Link>
           </button>
-          <button className="py-1 px-2 rounded text-white flex items-center border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] transition duration-300">
+          <button className="py-1 px-2 rounded text-white flex items-center bg-[#4B5C78] hover:bg-[#222831] transition duration-100">
             <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
             Help
           </button>
-          <button className="py-1 px-2 rounded text-white flex items-center border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] transition duration-300">
+          <button className="py-1 px-2 rounded text-white flex items-center bg-[#4B5C78] hover:bg-[#222831] transition duration-100">
             <Link href="/app">
               <FontAwesomeIcon icon={faHouse} className="mr-2" />
               Dashboard
@@ -132,13 +150,13 @@ const Navbar = () => {
       ) : (
         // User is not logged in
         <div className="flex items-center space-x-4">
-          <button className="py-1 px-2 rounded text-white flex items-center border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] transition duration-300">
+          <button className="py-1 px-2 rounded text-white flex items-center bg-[#4B5C78] hover:bg-[#222831] transition duration-100">
             <Link href="/login">
               <FontAwesomeIcon icon={faRightFromBracket} className="mr-2" />
               Login
             </Link>
           </button>
-          <button className="py-1 px-2 rounded text-white flex items-center border border-[#393E46] bg-[#222831] hover:border-[#00ADB5] transition duration-300">
+          <button className="py-1 px-2 rounded text-white flex items-center bg-[#4B5C78] hover:bg-[#222831] transition duration-100">
             <Link href="/register">Register</Link>
           </button>
         </div>

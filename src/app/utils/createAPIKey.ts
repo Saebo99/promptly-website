@@ -1,44 +1,40 @@
-import { getAuth, getIdToken } from "firebase/auth";
+import { db } from "@/app/firebase/firebaseClient";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import crypto from "crypto";
 
 export const createAPIKey = async (projectId: string, keyName = "New key") => {
-  const auth = getAuth();
-  const user = auth.currentUser;
-
-  if (!user) {
-    console.error("User not authenticated");
-    return;
-  }
-
-  let idToken;
+  const SECRET_CRYPTO_KEY =
+    "623c04d4bba66a6379db4df14c3cbca794153390ddcd204186066daf894c3e52";
+  console.log("projectId: ", projectId);
+  console.log("keyName: ", keyName);
+  // Perform API Key creation logic directly here
   try {
-    idToken = await getIdToken(user);
-  } catch (error) {
-    console.error("Error getting ID token", error);
-    return;
+    const apiKey = crypto.randomBytes(22).toString("hex");
+    const apiKeyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+    const iv = crypto.randomBytes(16);
+    const keyBuffer = Buffer.from(SECRET_CRYPTO_KEY || "", "hex");
+    const cipher = crypto.createCipheriv("aes-256-cbc", keyBuffer, iv);
+    const encryptedApiKey = Buffer.concat([
+      cipher.update(apiKey, "utf8"),
+      cipher.final(),
+    ]).toString("hex");
+    console.log("encryptedApiKey: ", encryptedApiKey);
+
+    const keysCollection = collection(db, "keys");
+    await addDoc(keysCollection, {
+      projectId: projectId,
+      name: keyName,
+      apiKeyEncrypted: encryptedApiKey,
+      iv: iv.toString("hex"),
+      apiKeyHashed: apiKeyHash,
+      createdAt: Timestamp.now(),
+      lastUsedAt: Timestamp.now(),
+    });
+
+    console.log("API Key created:", apiKey);
+    return apiKey; // Return the API key or relevant data as needed
+  } catch (e) {
+    console.error("Error creating API key:", e);
+    return null;
   }
-
-  // Send request to your server route
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/createAPIKey`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`, // Include the token in the Authorization header
-      },
-      body: JSON.stringify({
-        projectId: projectId,
-        keyName: keyName,
-      }),
-    }
-  );
-
-  // Handle the response
-  if (!response.ok) {
-    console.error("Failed to create API key:", await response.text());
-    return;
-  }
-
-  const data = await response.json();
-  console.log(data);
 };

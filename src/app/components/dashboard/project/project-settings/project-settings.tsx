@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectProjectId,
+  selectWhitelistModalOpen,
+  setWhitelistModalOpen,
+} from "../../../../../../redux/slices/projectSlice";
 
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/app/firebase/firebaseClient";
@@ -9,19 +13,35 @@ import { db } from "@/app/firebase/firebaseClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/pro-solid-svg-icons";
 
+import { getWhitelist } from "@/app/utils/getWhitelist";
+
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
 import TopBar from "./top-bar";
 import LoadingAnimation from "../../loading-animation/loading-animation";
+import WhitelistModal from "@/app/components/modals/whitelist-modal";
 
 const ProjectSettings = () => {
+  const dispatch = useDispatch();
   const projectId = useSelector(selectProjectId);
+  const whitelistModalOpen = useSelector(selectWhitelistModalOpen);
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [projectCredentials, setProjectCredentials] = useState({
     name: "",
     projectIdentifier: "",
   });
+  const [whitelistCriteria, setWhitelistCriteria] = useState<any>([]);
+
+  useEffect(() => {
+    const getCriteria = async () => {
+      const newWhitelistCriteria = await getWhitelist(projectId);
+      console.log("newWhitelistCriteria: ", newWhitelistCriteria);
+      setWhitelistCriteria(newWhitelistCriteria);
+    };
+
+    getCriteria();
+  }, [projectId]);
 
   useEffect(() => {
     const fetchProjectCredentials = async () => {
@@ -123,6 +143,53 @@ const ProjectSettings = () => {
               </button>
             </div>
           </div>
+          {/* Whitelist Criteria Display Box */}
+          <div className="box-border p-4 border border-[#393E46] rounded-md m-4 w-[60vw] shadow-lg">
+            <div className="w-full flex justify-between items-center">
+              <h3 className="text-lg font-semibold mb-4">Whitelisted URLs</h3>
+              <div
+                className="cursor-pointer flex items-center text-sm text-gray-400 hover:text-white duration-300"
+                onClick={() => dispatch(setWhitelistModalOpen(true))}
+              >
+                <FontAwesomeIcon icon={faPencilAlt} className="" />
+                <span className="ml-2">Add URL</span>
+              </div>
+            </div>
+            {whitelistCriteria.length > 0 ? (
+              whitelistCriteria.map((criteria: any, index: number) => (
+                <div
+                  key={index}
+                  className="mb-4 pb-4 border-b border-[#393E46]"
+                >
+                  <div className="mb-2">
+                    <p className="text-sm font-semibold text-gray-200">URL:</p>
+                    <p className="text-sm text-gray-400">{criteria.url}</p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm font-semibold text-gray-200">
+                      Includes:
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {criteria.includes || "None"}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm font-semibold text-gray-200">
+                      Excludes:
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {criteria.excludes || "None"}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-400">
+                No URLs have been whitelisted. White list URLs to restrict the
+                websites where your client key can be used.
+              </p>
+            )}
+          </div>
         </div>
       )}
       {showEditModal && (
@@ -132,6 +199,7 @@ const ProjectSettings = () => {
           currentName={projectCredentials.name}
         />
       )}
+      {whitelistModalOpen && <WhitelistModal />}
     </div>
   );
 };
@@ -163,9 +231,9 @@ const EditProjectNameModal = ({ onClose, onSubmit, currentName }: any) => {
         <button
           onClick={() => onSubmit(inputText)}
           disabled={!inputText.trim()}
-          className={`text-white py-2 px-4 rounded ${
+          className={`text-white mt-4 py-2 px-4 rounded ${
             inputText.trim()
-              ? "bg-[#00ADB5] hover:bg-[#00ADB5] duration-300"
+              ? "border border-[#00ADB5] hover:bg-[#00ADB5] duration-300"
               : "cursor-not-allowed"
           }`}
         >

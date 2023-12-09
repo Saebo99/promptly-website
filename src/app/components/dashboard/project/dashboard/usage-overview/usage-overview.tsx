@@ -33,7 +33,7 @@ const defaultChartData: ChartData<"bar"> = {
     {
       label: "Likes",
       data: [],
-      backgroundColor: "#00ADB5",
+      backgroundColor: "#4B5C78",
     },
     {
       label: "Dislikes",
@@ -87,7 +87,7 @@ const UsageOverview: React.FC<UsageOverviewProps> = () => {
         {
           label: "Likes",
           data: likeCounts,
-          backgroundColor: "#00ADB5",
+          backgroundColor: "#4B5C78",
         },
         {
           label: "Dislikes",

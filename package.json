@@ -1,5 +1,5 @@
 {
-  "name": "promptly-website",
+  "name": "flexibel-website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,12 +18,14 @@
     "@tanstack/react-table": "^8.10.7",
     "chart.js": "^4.4.0",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "chat-promptly": "^1.2.2",
     "encoding": "^0.1.13",
     "firebase": "^10.5.0",
+    "firebase-admin": "^11.11.1",
+    "flexibel": "^0.9.4",
     "framer-motion": "^10.16.4",
     "next": "13.5.6",
     "next-redux-wrapper": "^8.1.0",
+    "novel": "^0.1.22",
     "rc-slider": "^10.3.1",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
@@ -32,7 +34,8 @@
     "react-select": "^5.7.7",
     "react-step-progress-bar": "^1.0.3",
     "redux": "^4.2.1",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "uninstall": "^0.0.0"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.39",
