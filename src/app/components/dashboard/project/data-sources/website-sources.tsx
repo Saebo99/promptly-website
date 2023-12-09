@@ -17,20 +17,15 @@ import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
 
 import { deleteData } from "@/app/utils/deleteData";
 
-type Source = {
-  id: string;
-  source: string;
-  type: string;
-  insertedAt: string;
-  charCount: number;
-  isActive: boolean;
-};
-
 interface WebsiteSourcesProps {
-  sources: Source[];
+  sources: any[];
+  openModal: () => void;
 }
 
-const WebsiteSources: React.FC<WebsiteSourcesProps> = ({ sources }) => {
+const WebsiteSources: React.FC<WebsiteSourcesProps> = ({
+  sources,
+  openModal,
+}) => {
   const projectId = useSelector(selectProjectId);
   const [websiteSources, setWebsiteSources] = useState<any[]>([]);
 
@@ -316,14 +311,20 @@ const WebsiteSources: React.FC<WebsiteSourcesProps> = ({ sources }) => {
                 ))}
             </>
           ))}
-          <button className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100">
+          <button
+            onClick={openModal}
+            className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new website
           </button>
         </div>
       ) : (
         <div className="flex-auto flex justify-center items-center text-gray-400">
-          <button className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100">
+          <button
+            onClick={openModal}
+            className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new website
           </button>

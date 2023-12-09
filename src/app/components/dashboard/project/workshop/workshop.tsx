@@ -23,7 +23,6 @@ import {
 } from "firebase/firestore"; // Importing necessary Firestore functions
 
 import { useProjectListener } from "@/app/hooks/useProjectListener";
-import { getAPIKeys } from "@/app/utils/getAPIKeys";
 import { getClientKey } from "@/app/utils/getClientKey";
 
 import LoadingAnimation from "../../loading-animation/loading-animation";
@@ -436,6 +435,10 @@ const Workshop = () => {
                   handleCreateNewModel={handleCreateNewModel}
                   handleDeleteModel={handleDeleteModel}
                   handleUpdateModel={handleUpdateModel}
+                  selectedColors={selectedColors}
+                  currentModel={currentModel}
+                  temperature={temperature}
+                  responseLength={responseLength}
                 />
               )}
             </div>

@@ -40,7 +40,7 @@ const TopBar: React.FC<TopBarProps> = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={() => setCreatingApiKey(true)}
-            className="px-4 py-2 rounded border border-[#00ADB5] bg-[#222831] hover:bg-[#00ADB5] transition duration-300"
+            className="px-4 py-2 rounded bg-[#222831] hover:bg-[#4B5C78] transition duration-100"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             <span>Create new key</span>
@@ -49,7 +49,7 @@ const TopBar: React.FC<TopBarProps> = ({
         {canDelete && (
           <button
             onClick={handleDeleteKeys}
-            className="px-4 py-2 rounded border border-red-500 bg-[#222831] hover:bg-red-500 transition duration-300"
+            className="px-4 py-2 rounded border border-red-500 bg-[#222831] hover:bg-red-500 transition duration-100"
           >
             <FontAwesomeIcon icon={faTrash} className="mr-2" />
             <span>Delete selected keys</span>

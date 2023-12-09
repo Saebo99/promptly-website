@@ -18,27 +18,9 @@ import { createFaqGroup } from "@/app/utils/createFaqGroup";
 
 import FaqGroupModal from "./faq-group-modal";
 
-type Faq = {
-  id: string;
-  question: string;
-  answer: string;
-  insertedAt: string;
-  isDeleting: boolean;
-};
-
-type Source = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  insertedAt: string;
-  isActive: boolean;
-  faqs: Faq[];
-};
-
 interface FaqGroupsProps {
-  sources: Source[];
-  setActiveFaqGroup: React.Dispatch<React.SetStateAction<Source | null>>;
+  sources: any[];
+  setActiveFaqGroup: React.Dispatch<React.SetStateAction<any | null>>;
 }
 
 const FaqGroups: React.FC<FaqGroupsProps> = ({

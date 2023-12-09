@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-import { db } from "../../../../../firebase/firebaseClient";
-import { collection, getDocs, doc } from "firebase/firestore";
-
 import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../../redux/slices/projectSlice";
+import {
+  selectProjectId,
+  selectSources,
+} from "../../../../../../../redux/slices/projectSlice";
+
+import { useDataSourceListener } from "../../../../../hooks/useDataSourceListener";
+import { ingestFile } from "@/app/utils/ingestFile";
 
 import Sidebar from "../../sidebar";
 import DashboardNavbar from "../../dashboard-navbar";
@@ -12,21 +15,17 @@ import FileSources from "./file-sources";
 import TopBar from "./top-bar";
 import DataImport from "../../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../../loading-animation/loading-animation";
-
-type Source = {
-  id: string;
-  source: string;
-  type: string;
-  insertedAt: string;
-  charCount: number;
-  isActive: boolean;
-};
+import FileModal from "@/app/components/modals/data-modals/file-modal";
 
 const FilePage = () => {
   const projectId = useSelector(selectProjectId);
-  const [sources, setSources] = useState<Source[]>([]);
+  const sources = useSelector(selectSources);
+  const [fileSources, setFileSources] = useState<any>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useDataSourceListener();
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -36,30 +35,26 @@ const FilePage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!projectId) return;
+    console.log("sources: ", sources);
+    if (sources) {
+      setFileSources(
+        sources.filter((source: any) => source.type === "website")
+      );
+    }
+  }, [sources]);
 
-      const projectRef = doc(db, "projects", projectId);
-      const dataSourcesRef = collection(projectRef, "dataSources");
-      const dataSourcesSnapshot = await getDocs(dataSourcesRef);
-
-      const sourcesData = dataSourcesSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          source: data.source,
-          type: data.type,
-          insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          charCount: data.charCount,
-          isActive: data.isActive.toString(),
-        };
-      });
-      console.log("sourcesData: ", sourcesData);
-      setSources(sourcesData as Source[]);
-    };
-
-    fetchData();
-  }, [projectId]);
+  const handleImport = async (files: File[]) => {
+    for (const file of files) {
+      try {
+        const result = await ingestFile(file, projectId);
+        console.log(`File ${file.name} uploaded successfully:`, result);
+      } catch (err) {
+        console.error(`Error uploading file ${file.name}:`, err);
+        throw err; // If you want the loop to stop processing further files when an error is encountered
+      }
+    }
+    setModalOpen(false);
+  };
 
   return (
     <div className="w-screen h-screen bg-[#222831] flex">
@@ -82,10 +77,19 @@ const FilePage = () => {
                 <DataImport />
               </div>
             ) : (
-              <FileSources sources={sources} />
+              <FileSources
+                sources={fileSources}
+                openModal={() => setModalOpen(true)}
+              />
             )}
           </div>
         </div>
+      )}
+      {modalOpen && (
+        <FileModal
+          closeModal={() => setModalOpen(false)}
+          onImport={handleImport}
+        />
       )}
     </div>
   );

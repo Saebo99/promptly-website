@@ -78,7 +78,7 @@ const ModelConfigurator: React.FC<ModelConfiguratorProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[1000px] h-full mt-8 px-4 bg-[#222831] text-white flex flex-col">
+    <div className="w-full max-w-[1000px] h-[60vh] mt-8 px-4 bg-[#222831] text-white flex flex-col overflow-scroll">
       {/* Model Name */}
       <div className="space-y-2">
         <label className="text-gray-400">Model Name</label>

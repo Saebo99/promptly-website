@@ -4,7 +4,13 @@ import { db } from "@/app/firebase/firebaseClient";
 import { collection, getDocs, doc } from "firebase/firestore";
 
 import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../redux/slices/projectSlice";
+import {
+  selectProjectId,
+  selectSources,
+} from "../../../../../../redux/slices/projectSlice";
+
+import { useDataSourceListener } from "../../../../hooks/useDataSourceListener";
+import { ingestData } from "@/app/utils/ingestData";
 
 import Sidebar from "../sidebar";
 import DashboardNavbar from "../dashboard-navbar";
@@ -12,21 +18,17 @@ import WebsiteSources from "./website-sources";
 import TopBar from "./top-bar";
 import DataImport from "../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../loading-animation/loading-animation";
-
-type Source = {
-  id: string;
-  source: string;
-  type: string;
-  insertedAt: string;
-  charCount: number;
-  isActive: boolean;
-};
+import WebsiteModal from "@/app/components/modals/data-modals/website-modal";
 
 const DataSources = () => {
   const projectId = useSelector(selectProjectId);
-  const [sources, setSources] = useState<Source[]>([]);
+  const sources = useSelector(selectSources);
+  const [websiteSources, setWebsiteSources] = useState<any>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useDataSourceListener();
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -36,30 +38,23 @@ const DataSources = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!projectId) return;
+    console.log("sources: ", sources);
+    if (sources) {
+      setWebsiteSources(
+        sources.filter((source: any) => source.type === "website")
+      );
+    }
+  }, [sources]);
 
-      const projectRef = doc(db, "projects", projectId);
-      const dataSourcesRef = collection(projectRef, "dataSources");
-      const dataSourcesSnapshot = await getDocs(dataSourcesRef);
-
-      const sourcesData = dataSourcesSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          source: data.source,
-          type: data.type,
-          insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          charCount: data.charCount,
-          isActive: data.isActive.toString(),
-        };
-      });
-      console.log("sourcesData: ", sourcesData);
-      setSources(sourcesData as Source[]);
-    };
-
-    fetchData();
-  }, [projectId]);
+  const handleImport = async (data: any) => {
+    console.log(data); // For now, just log the data. You can implement your logic here.
+    await ingestData(
+      data.urls.split(",").map((url: string) => url.trim()),
+      data.crawlType,
+      projectId
+    );
+    setModalOpen(false);
+  };
 
   return (
     <div className="w-screen h-screen bg-[#222831] flex">
@@ -82,10 +77,22 @@ const DataSources = () => {
                 <DataImport />
               </div>
             ) : (
-              <WebsiteSources sources={sources} />
+              <WebsiteSources
+                sources={websiteSources}
+                openModal={() => {
+                  console.log("hello");
+                  setModalOpen(true);
+                }}
+              />
             )}
           </div>
         </div>
+      )}
+      {modalOpen && (
+        <WebsiteModal
+          closeModal={() => setModalOpen(false)}
+          onImport={handleImport}
+        />
       )}
     </div>
   );

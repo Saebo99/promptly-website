@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { db } from "../../../../../firebase/firebaseClient";
-import { collection, getDocs, doc } from "firebase/firestore";
-
 import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../../redux/slices/projectSlice";
+import { selectSources } from "../../../../../../../redux/slices/projectSlice";
+
+import { useDataSourceListener } from "../../../../../hooks/useDataSourceListener";
 
 import Sidebar from "../../sidebar";
 import DashboardNavbar from "../../dashboard-navbar";
@@ -13,22 +12,13 @@ import ImprovedAnswerSources from "./improved-answer-sources";
 import DataImport from "../../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../../loading-animation/loading-animation";
 
-type ImprovedAnswerSource = {
-  id: string;
-  source: string;
-  insertedAt: string;
-  updatedAt: string;
-  question: string;
-  answer: string;
-  isActive: boolean;
-  type: string;
-};
-
 const ImprovedAnswersPage = () => {
-  const projectId = useSelector(selectProjectId);
-  const [sources, setSources] = useState<ImprovedAnswerSource[]>([]);
+  const sources = useSelector(selectSources);
+  const [improvedAnswerSources, setImprovedAnswerSources] = useState<any>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+
+  useDataSourceListener();
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -38,32 +28,13 @@ const ImprovedAnswersPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!projectId) return;
-
-      const projectRef = doc(db, "projects", projectId);
-      const dataSourcesRef = collection(projectRef, "dataSources");
-      const dataSourcesSnapshot = await getDocs(dataSourcesRef);
-
-      const sourcesData = dataSourcesSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          source: data.source,
-          insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          updatedAt: data.updatedAt?.toDate().toLocaleDateString() || "",
-          question: data.question,
-          answer: data.answer,
-          isActive: data.isActive,
-          type: data.type,
-        };
-      });
-      console.log("sourcesData: ", sourcesData);
-      setSources(sourcesData as ImprovedAnswerSource[]);
-    };
-
-    fetchData();
-  }, [projectId]);
+    console.log("sources: ", sources);
+    if (sources) {
+      setImprovedAnswerSources(
+        sources.filter((source: any) => source.type === "improved answer")
+      );
+    }
+  }, [sources]);
 
   return (
     <div className="w-screen h-screen bg-[#222831] flex">
@@ -86,7 +57,7 @@ const ImprovedAnswersPage = () => {
                 <DataImport />
               </div>
             ) : (
-              <ImprovedAnswerSources sources={sources} />
+              <ImprovedAnswerSources sources={improvedAnswerSources} />
             )}
           </div>
         </div>

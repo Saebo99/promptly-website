@@ -19,6 +19,7 @@ import {
 import { setModelId } from "../../../../../redux/slices/modelSlice";
 
 import { createClientAPIKey } from "@/app/utils/createClientAPIKey";
+import { createAPIKey } from "@/app/utils/createAPIKey";
 
 import LoadingAnimation from "../loading-animation/loading-animation";
 import DashboardNavbar from "@/app/components/dashboard/project/dashboard-navbar";
@@ -136,6 +137,7 @@ const ProjectCreator = () => {
 
         // Step 4: Create a client api key for the project
         await createClientAPIKey(docRef.id);
+        await createAPIKey(docRef.id);
 
         // Redirecting to the project page
         router.push(`/app/${tempProjectId}`);

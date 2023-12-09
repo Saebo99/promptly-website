@@ -4,7 +4,12 @@ import { db } from "../../../../../firebase/firebaseClient";
 import { collection, getDocs, doc } from "firebase/firestore";
 
 import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../../redux/slices/projectSlice";
+import {
+  selectProjectId,
+  selectSources,
+} from "../../../../../../../redux/slices/projectSlice";
+
+import { useDataSourceListener } from "../../../../../hooks/useDataSourceListener";
 
 import Sidebar from "../../sidebar";
 import DashboardNavbar from "../../dashboard-navbar";
@@ -14,30 +19,14 @@ import TopBar from "./top-bar";
 import DataImport from "../../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../../loading-animation/loading-animation";
 
-type Faq = {
-  id: string;
-  question: string;
-  answer: string;
-  insertedAt: string;
-  isDeleting: boolean;
-};
-
-type Source = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  insertedAt: string;
-  isActive: boolean;
-  faqs: Faq[];
-};
-
 const FaqPage = () => {
-  const projectId = useSelector(selectProjectId);
-  const [sources, setSources] = useState<Source[]>([]);
+  const sources = useSelector(selectSources);
+  const [faqSources, setFaqSources] = useState<any[]>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
-  const [activeFaqGroup, setActiveFaqGroup] = useState<Source | null>(null);
+  const [activeFaqGroup, setActiveFaqGroup] = useState<any | null>(null);
+
+  useDataSourceListener();
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -47,31 +36,11 @@ const FaqPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!projectId) return;
-
-      const projectRef = doc(db, "projects", projectId);
-      const dataSourcesRef = collection(projectRef, "dataSources");
-      const dataSourcesSnapshot = await getDocs(dataSourcesRef);
-
-      const sourcesData = dataSourcesSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name,
-          description: data.description,
-          type: data.type,
-          insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          isActive: data.isActive.toString(),
-          faqs: data.faqs,
-        };
-      });
-      console.log("sourcesData: ", sourcesData);
-      setSources(sourcesData as Source[]);
-    };
-
-    fetchData();
-  }, [projectId]);
+    console.log("sources: ", sources);
+    if (sources) {
+      setFaqSources(sources.filter((source: any) => source.type === "faq"));
+    }
+  }, [sources]);
 
   return (
     <div className="w-screen h-screen bg-[#222831] flex">
@@ -99,7 +68,7 @@ const FaqPage = () => {
               <FaqList activeFaqGroup={activeFaqGroup} />
             ) : (
               <FaqGroups
-                sources={sources}
+                sources={faqSources}
                 setActiveFaqGroup={setActiveFaqGroup}
               />
             )}

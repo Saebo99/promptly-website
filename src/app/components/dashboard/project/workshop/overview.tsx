@@ -14,6 +14,19 @@ interface OverviewProps {
   handleCreateNewModel: (saveAsNew?: boolean) => void;
   handleDeleteModel: () => void;
   handleUpdateModel: () => void;
+  selectedColors: {
+    background: string;
+    buttonBackground: string;
+    text: string;
+    buttonText: string;
+    inputBackground: string;
+    inputText: string;
+    aiIcon: string;
+    userIcon: string;
+  };
+  currentModel: string;
+  temperature: number;
+  responseLength: number;
 }
 
 type Model = {
@@ -26,12 +39,27 @@ type Model = {
   suggestedMessages: string[];
 };
 
+const colorLabels: { [key: string]: string } = {
+  background: "Background",
+  text: "Text",
+  buttonBackground: "Button",
+  buttonText: "Button Text",
+  inputBackground: "Input",
+  inputText: "Input Text",
+  aiIcon: "AI Icon",
+  userIcon: "User Icon",
+};
+
 const Overview: React.FC<OverviewProps> = ({
   modelIds,
   modelId,
   handleCreateNewModel,
   handleDeleteModel,
   handleUpdateModel,
+  selectedColors,
+  currentModel,
+  temperature,
+  responseLength,
 }) => {
   const dispatch = useDispatch();
   const projectId = useSelector(selectProjectId);
@@ -109,11 +137,9 @@ const Overview: React.FC<OverviewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[1000px] h-full my-8 flex flex-col p-4 bg-[#222831] text-white">
+    <div className="w-full max-w-[1000px] h-[60vh] my-8 flex flex-col p-4 bg-[#222831] text-white overflow-scroll">
       <div className="w-full space-y-2">
-        <div className="flex justify-between items-center mb-1">
-          <label className="text-gray-400">Selected Model</label>
-        </div>
+        <label className="text-gray-400">Selected Model</label>
         <Select
           options={models}
           styles={customStyles}
@@ -121,34 +147,53 @@ const Overview: React.FC<OverviewProps> = ({
           value={selectedModel}
         />
       </div>
-      <button
-        onClick={() => {
-          handleCreateNewModel(true);
-        }}
-        className="mt-8 px-4 py-2 w-fit rounded bg-[#4B5C78] hover:bg-[#393E46] transition duration-100"
-      >
-        Save as new model
-      </button>
-      <button
-        onClick={() => {
-          handleCreateNewModel();
-        }}
-        className="mt-8 px-4 py-2 w-fit rounded bg-[#4B5C78] hover:bg-[#393E46] transition duration-100"
-      >
-        Create model from scratch
-      </button>
-      <button
-        onClick={handleUpdateModel}
-        className="mt-8 px-4 py-2 w-fit rounded bg-[#4B5C78] hover:bg-[#393E46] transition duration-100"
-      >
-        Save and deploy
-      </button>
-      <button
-        onClick={handleDeleteModel}
-        className="mt-8 px-4 py-2 w-fit rounded bg-[#4B5C78] hover:bg-[#393E46] transition duration-100"
-      >
-        Delete
-      </button>
+
+      <div className="w-full mt-6 flex justify-between items-center">
+        <span className="text-gray-400">Model</span>
+        <div className="cursor-pointer px-2 py-1 rounded hover:bg-[#4B5C78] duration-100">
+          {currentModel}
+        </div>
+      </div>
+      <div className="w-full mt-6 flex justify-between items-center">
+        <span className="text-gray-400">Temperature</span>
+        <div className="cursor-pointer px-2 py-1 rounded hover:bg-[#4B5C78] duration-100">
+          {temperature}
+        </div>
+      </div>
+      <div className="w-full mt-6 flex justify-between items-center">
+        <span className="text-gray-400">Response length</span>
+        <div className="cursor-pointer px-2 py-1 rounded hover:bg-[#4B5C78] duration-100">
+          {responseLength}
+        </div>
+      </div>
+      <div className="w-full mt-6">
+        <span className="text-gray-400">Current palette</span>
+        <div className="grid grid-cols-4 gap-4">
+          {Object.entries(selectedColors).map(([key, value]) => (
+            <div key={key} className="text-center">
+              <div
+                className="w-full h-20 rounded-sm mb-1"
+                style={{ backgroundColor: value }}
+              ></div>
+              <span className="text-xs text-white">{colorLabels[key]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="w-full mt-6 flex justify-between items-center">
+        <div className="flex flex-col">
+          <span className="text-gray-400">Response length</span>
+          <span className="text-gray-400 text-sm">
+            This action is permanent and cannot be undone
+          </span>
+        </div>
+        <button
+          onClick={handleDeleteModel}
+          className="mt-8 px-4 py-2 w-fit rounded bg-red-500 hover:bg-red-600 transition duration-100"
+        >
+          Delete
+        </button>
+      </div>
     </div>
   );
 };

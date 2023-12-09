@@ -90,19 +90,17 @@ const KeyTable: React.FC<KeyTableProps> = ({ keys }) => {
               />
             ) : (
               <div className="flex items-center">
-                <div className="flex justify-center items-center bg-red-500 text-white cursor-pointer mr-2 w-7 h-7 border border-red-500 rounded hover:bg-red-600 hover:border-red-600 duration-300">
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    size="sm"
-                    onClick={() => confirmDelete(key.decryptedKey)}
-                  />
+                <div
+                  onClick={() => confirmDelete(key.decryptedKey)}
+                  className="flex justify-center items-center bg-red-500 text-white cursor-pointer mr-2 w-7 h-7 border border-red-500 rounded hover:bg-red-600 hover:border-red-600 duration-300"
+                >
+                  <FontAwesomeIcon icon={faCheck} size="sm" />
                 </div>
-                <div className="flex justify-center items-center bg-[#393E46] text-white cursor-pointer mr-2 w-7 h-7 border border-[#393E46] rounded hover:bg-[#30353D] hover:border-[#30353D] duration-300">
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    size="sm"
-                    onClick={() => handleDeleteClick(key.decryptedKey)}
-                  />
+                <div
+                  onClick={() => handleDeleteClick(key.decryptedKey)}
+                  className="flex justify-center items-center bg-[#393E46] text-white cursor-pointer mr-2 w-7 h-7 border border-[#393E46] rounded hover:bg-[#30353D] hover:border-[#30353D] duration-300"
+                >
+                  <FontAwesomeIcon icon={faTimes} size="sm" />
                 </div>
               </div>
             )}

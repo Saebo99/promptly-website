@@ -14,20 +14,12 @@ import { useSelector } from "react-redux";
 import { selectProjectId } from "../../../../../../../redux/slices/projectSlice";
 import { deleteData } from "@/app/utils/deleteData";
 
-type Source = {
-  id: string;
-  source: string;
-  type: string;
-  insertedAt: string;
-  charCount: number;
-  isActive: boolean;
-};
-
 interface FileSourcesProps {
-  sources: Source[];
+  sources: any[];
+  openModal: () => void;
 }
 
-const FileSources: React.FC<FileSourcesProps> = ({ sources }) => {
+const FileSources: React.FC<FileSourcesProps> = ({ sources, openModal }) => {
   const projectId = useSelector(selectProjectId);
   const [fileSources, setFileSources] = useState<any[]>([]);
 
@@ -127,14 +119,20 @@ const FileSources: React.FC<FileSourcesProps> = ({ sources }) => {
               </div>
             </div>
           ))}
-          <button className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100">
+          <button
+            onClick={openModal}
+            className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new file
           </button>
         </div>
       ) : (
         <div className="flex-auto flex justify-center items-center text-gray-400">
-          <button className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100">
+          <button
+            onClick={openModal}
+            className="w-fit px-2 py-1 text-sm rounded hover:bg-[#4B5C78] text-gray-400 hover:text-white duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new file
           </button>

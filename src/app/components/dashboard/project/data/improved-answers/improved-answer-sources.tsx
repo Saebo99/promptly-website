@@ -22,19 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { deleteData } from "@/app/utils/deleteData";
 
-type ImprovedAnswerSource = {
-  id: string;
-  source: string;
-  insertedAt: string;
-  updatedAt: string;
-  question: string;
-  answer: string;
-  isActive: boolean;
-  type: string;
-};
-
 interface ImprovedAnswerSourcesProps {
-  sources: ImprovedAnswerSource[];
+  sources: any[];
 }
 
 const ImprovedAnswerSources: React.FC<ImprovedAnswerSourcesProps> = ({

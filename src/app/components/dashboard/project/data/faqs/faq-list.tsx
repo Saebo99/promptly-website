@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import { db } from "@/app/firebase/firebaseClient";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useSelector } from "react-redux";
@@ -17,7 +14,6 @@ import {
   faChevronRight,
 } from "@fortawesome/pro-regular-svg-icons";
 
-import { getAPIKeys } from "@/app/utils/getAPIKeys";
 import { ingestFaq } from "@/app/utils/ingestFaq";
 import { deleteFaq } from "@/app/utils/deleteFaq";
 
@@ -48,23 +44,11 @@ interface FaqListProps {
 const FaqList: React.FC<FaqListProps> = ({ activeFaqGroup }) => {
   const projectId = useSelector(selectProjectId);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [apiKey, setApiKey] = useState<string>("");
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<Set<string>>(new Set());
   const [editableFaqs, setEditableFaqs] = useState<{
     [id: string]: { question: string; answer: string };
   }>({});
-
-  useEffect(() => {
-    const fetchAPIKeys = async () => {
-      const keys = await getAPIKeys(projectId);
-      setApiKey(keys[0].decryptedKey);
-    };
-
-    if (projectId) {
-      fetchAPIKeys();
-    }
-  }, [projectId]);
 
   useEffect(() => {
     if (activeFaqGroup) {

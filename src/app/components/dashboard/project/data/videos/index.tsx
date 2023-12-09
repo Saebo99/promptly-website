@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-import { db } from "../../../../../firebase/firebaseClient";
-import { collection, getDocs, doc } from "firebase/firestore";
-
 import { useSelector } from "react-redux";
-import { selectProjectId } from "../../../../../../../redux/slices/projectSlice";
+import {
+  selectProjectId,
+  selectSources,
+} from "../../../../../../../redux/slices/projectSlice";
+
+import { useDataSourceListener } from "../../../../../hooks/useDataSourceListener";
+import { ingestVideo } from "@/app/utils/ingestVideo";
 
 import Sidebar from "../../sidebar";
 import DashboardNavbar from "../../dashboard-navbar";
@@ -12,22 +15,17 @@ import VideoSources from "./video-sources";
 import TopBar from "./top-bar";
 import DataImport from "../../../project-creator/data-import/data-import";
 import LoadingAnimation from "../../../loading-animation/loading-animation";
-
-type Source = {
-  id: string;
-  source: string; // Assume this is the YouTube video URL
-  title: string;
-  author: string;
-  type: string;
-  insertedAt: string;
-  isActive: boolean;
-};
+import VideoModal from "@/app/components/modals/data-modals/video-modal";
 
 const VideoPage = () => {
   const projectId = useSelector(selectProjectId);
-  const [sources, setSources] = useState<Source[]>([]);
+  const sources = useSelector(selectSources);
+  const [videoSources, setVideoSources] = useState<any>([]);
   const [addingSource, setAddingSource] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useDataSourceListener();
 
   // useEffect hook to simulate loading animation
   useEffect(() => {
@@ -37,31 +35,16 @@ const VideoPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!projectId) return;
+    console.log("sources: ", sources);
+    if (sources) {
+      setVideoSources(sources.filter((source: any) => source.type === "video"));
+    }
+  }, [sources]);
 
-      const projectRef = doc(db, "projects", projectId);
-      const dataSourcesRef = collection(projectRef, "dataSources");
-      const dataSourcesSnapshot = await getDocs(dataSourcesRef);
-
-      const sourcesData = dataSourcesSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          source: data.source,
-          title: data.title,
-          author: data.author,
-          type: data.type,
-          insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          isActive: data.isActive.toString(),
-        };
-      });
-      console.log("sourcesData: ", sourcesData);
-      setSources(sourcesData as Source[]);
-    };
-
-    fetchData();
-  }, [projectId]);
+  const handleImport = async (url: string) => {
+    await ingestVideo(url, projectId);
+    setModalOpen(false);
+  };
 
   return (
     <div className="w-screen h-screen bg-[#222831] flex">
@@ -84,10 +67,19 @@ const VideoPage = () => {
                 <DataImport />
               </div>
             ) : (
-              <VideoSources sources={sources} />
+              <VideoSources
+                sources={videoSources}
+                openModal={() => setModalOpen(true)}
+              />
             )}
           </div>
         </div>
+      )}
+      {modalOpen && (
+        <VideoModal
+          closeModal={() => setModalOpen(false)}
+          onImport={handleImport}
+        />
       )}
     </div>
   );

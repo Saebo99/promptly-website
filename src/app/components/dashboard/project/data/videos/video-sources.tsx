@@ -12,21 +12,12 @@ import {
 } from "@fortawesome/pro-regular-svg-icons";
 import { deleteData } from "@/app/utils/deleteData";
 
-type Source = {
-  id: string;
-  source: string; // Assume this is the YouTube video URL
-  title: string;
-  author: string;
-  type: string;
-  insertedAt: string;
-  isActive: boolean;
-};
-
 interface VideoSourcesProps {
-  sources: Source[];
+  sources: any[];
+  openModal: () => void;
 }
 
-const VideoSources: React.FC<VideoSourcesProps> = ({ sources }) => {
+const VideoSources: React.FC<VideoSourcesProps> = ({ sources, openModal }) => {
   const projectId = useSelector(selectProjectId);
   const [videoSources, setVideoSources] = useState<any[]>([]);
 
@@ -160,14 +151,20 @@ const VideoSources: React.FC<VideoSourcesProps> = ({ sources }) => {
               </div>
             </div>
           ))}
-          <div className="cursor-pointer flex justify-center items-center rounded shadow w-80 h-[260px] text-gray-400 hover:text-white border border-[#4B5C78] hover:bg-[#4B5C78] duration-100">
+          <div
+            onClick={openModal}
+            className="cursor-pointer flex justify-center items-center rounded shadow w-80 h-[260px] text-gray-400 hover:text-white border border-[#4B5C78] hover:bg-[#4B5C78] duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new video
           </div>
         </div>
       ) : (
         <div className="flex-auto flex justify-center items-center text-gray-400">
-          <div className="cursor-pointer flex justify-center items-center rounded shadow w-80 h-[260px] text-gray-400 hover:text-white border border-[#4B5C78] hover:bg-[#4B5C78] duration-100">
+          <div
+            onClick={openModal}
+            className="cursor-pointer flex justify-center items-center rounded shadow w-80 h-[260px] text-gray-400 hover:text-white border border-[#4B5C78] hover:bg-[#4B5C78] duration-100"
+          >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add new video
           </div>
