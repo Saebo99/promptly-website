@@ -18,6 +18,8 @@ interface DesignProps {
     buttonText: string;
     inputBackground: string;
     inputText: string;
+    aiIcon: string;
+    userIcon: string;
   };
   setSelectedColors: React.Dispatch<React.SetStateAction<any>>;
 }
