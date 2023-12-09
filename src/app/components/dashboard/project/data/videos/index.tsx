@@ -15,10 +15,11 @@ import LoadingAnimation from "../../../loading-animation/loading-animation";
 
 type Source = {
   id: string;
-  source: string;
+  source: string; // Assume this is the YouTube video URL
+  title: string;
+  author: string;
   type: string;
   insertedAt: string;
-  charCount: number;
   isActive: boolean;
 };
 
@@ -52,7 +53,6 @@ const VideoPage = () => {
           author: data.author,
           type: data.type,
           insertedAt: data.insertedAt.toDate().toLocaleDateString(), // Convert to Date object, then to string
-          charCount: data.charCount,
           isActive: data.isActive.toString(),
         };
       });

@@ -19,6 +19,7 @@ type Source = {
   author: string;
   type: string;
   insertedAt: string;
+  isActive: boolean;
 };
 
 interface VideoSourcesProps {
